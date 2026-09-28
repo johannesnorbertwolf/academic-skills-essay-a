@@ -29,4 +29,7 @@ was made, so the rules matter as much as the essay.
 - Record every prompt sent to the AI in `PROMPTS.md`, together with the AI's
   reply.
 - Record the AI's planning questions and the user's answers in `PROMPTS.md` too.
+- Keep `DIALOGUE.md` current by running `dialogue.py`: it records every prompt
+  Johannes typed and the AI's concluding answer, without the reasoning or tool
+  activity.
 - Keep `COSTS.md` current by running `costs.py`.

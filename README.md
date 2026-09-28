@@ -47,10 +47,14 @@ Everything is generated from three things:
    checked step by step.
 4. **`COSTS.md`** — the token usage and API spend for the AI used in this
    project, read automatically from the tool's own records.
+5. **`DIALOGUE.md`** — every prompt Johannes typed while building the project,
+   with the AI's concluding answer to each, without the hidden reasoning or
+   tool activity.
 
 `build.py` turns the master text into the coloured web page, the printable
-version, and the APA PDF. `costs.py` regenerates `COSTS.md`. Nobody edits any of
-those by hand, so they cannot quietly disagree with the master text.
+version, and the APA PDF. `costs.py` regenerates `COSTS.md`, and `dialogue.py`
+regenerates `DIALOGUE.md`. Nobody edits any of those by hand, so they cannot
+quietly disagree with the master text.
 
 ## Sources
 
