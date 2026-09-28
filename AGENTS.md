@@ -9,6 +9,8 @@ was made, so the rules matter as much as the essay.
 - Make exactly **one commit after each user prompt**, unless that prompt caused
   no change to any file. Never batch several prompts into one commit.
 - The commit message should plainly describe what the prompt asked for.
+- The body of the commit message must quote the user's prompt **verbatim**, so
+  the git history is a faithful record of every instruction, not a paraphrase.
 
 ## Never commit copyrighted material
 
