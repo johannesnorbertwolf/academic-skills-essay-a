@@ -40,23 +40,20 @@ Everything is generated from three things:
 1. **`essay.md`** — the master text. Words written by Johannes appear as normal
    text. Words written by the AI are wrapped in a small tag that names the prompt
    that produced them. Anything untagged is counted as Johannes's.
-2. **`PROMPTS.md`** — every prompt sent to the AI, in order, with the exact reply.
-   It also records the AI's planning questions and Johannes's answers, so the
-   decisions behind the project are visible too.
+2. **`PROMPTS.md`** — the single, generated log of the conversation: every prompt
+   sent to the AI with its answer, and every planning question with Johannes's
+   answer, in order. The numbers match the AI tags in `essay.md`.
 3. **The git history** — each change is a dated commit, so the process can be
    checked step by step.
 4. **`COSTS.md`** — the token usage and API spend for the AI used in this
    project, read automatically from the tool's own records.
-5. **`DIALOGUE.md`** — every prompt Johannes typed while building the project,
-   with the AI's concluding answer to each, without the hidden reasoning or
-   tool activity.
-6. **`WORDCOUNT.md`** — the running word count of the essay body, kept against
+5. **`WORDCOUNT.md`** — the running word count of the essay body, kept against
    the required 700–1000 words. Headings and the appendix (reflection, statement
    on AI use) do not count.
 
 `build.py` turns the master text into the coloured web page, the printable
 version, the APA PDF, and `WORDCOUNT.md`. `costs.py` regenerates `COSTS.md`, and
-`dialogue.py` regenerates `DIALOGUE.md`. Nobody edits any of those by hand, so
+`prompts.py` regenerates `PROMPTS.md`. Nobody edits any of those by hand, so
 they cannot quietly disagree with the master text.
 
 ## Sources

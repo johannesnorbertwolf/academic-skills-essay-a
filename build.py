@@ -49,9 +49,9 @@ def parse_prompts(text):
         num = int(parts[i])
         snippet = ""
         for line in parts[i + 1].splitlines():
-            line = line.strip().lstrip(">").strip()
-            if line and not line.startswith("**"):
-                snippet = line
+            line = line.strip()
+            if line.startswith(">"):
+                snippet = line.lstrip(">").strip()
                 break
         prompts[num] = snippet
     return prompts
