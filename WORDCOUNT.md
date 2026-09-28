@@ -5,7 +5,7 @@ is anything from the appendix onward (the reflection and the statement on AI
 use). The reference list is generated separately and is not counted either.
 This matches the assignment's rules.
 
-- **Current essay body: 771 words**
+- **Current essay body: 853 words**
 - Target: about 800 words
 - Hard requirement: 700 to 1000 words
 - Status: **within the required range**
