@@ -52,6 +52,15 @@ Everything is generated from three things:
 version, and the APA PDF. `costs.py` regenerates `COSTS.md`. Nobody edits any of
 those by hand, so they cannot quietly disagree with the master text.
 
+## Sources
+
+The course syllabus and the two papers the essay draws on are listed in
+`SOURCES.md`, with full references. The files themselves are kept in the
+`sources/` folder of the working copy but are deliberately **not committed**,
+because they are copyrighted course and publisher materials. The two papers are
+also entered in `refs.bib`, so they can be cited in the essay and appear in the
+reference list automatically.
+
 ## Authorship statement
 
 I, Johannes Wolf, am the author of this essay. I designed its structure, chose

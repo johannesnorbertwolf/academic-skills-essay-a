@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .venv/
 .build/
+
+# Course materials are copyrighted and must never be committed.
+sources/
