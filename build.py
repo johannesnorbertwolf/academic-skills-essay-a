@@ -1,23 +1,45 @@
 #!/usr/bin/env python3
-"""Turn essay.md (the master text) into the reader-friendly outputs.
+"""Build every reader-facing output from the master text (essay.md).
 
-Nothing here is edited by hand. Run this after any change to essay.md or
-PROMPTS.md and it rebuilds docs/index.html and docs/print.html.
+Produces:
+  docs/index.html   colour-coded, word-level attribution (web)
+  docs/print.html   same, for printing
+  docs/essay.pdf    clean APA 7 PDF for submission
+
+Run this after any change to essay.md, PROMPTS.md or refs.bib.
 """
 
 import html
 import re
+import shutil
+import subprocess
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "essay.md"
 PROMPTS = ROOT / "PROMPTS.md"
+REFS = ROOT / "refs.bib"
 DOCS = ROOT / "docs"
-REPO_URL = "https://github.com/johannesnorbertwolf/academic-skills-essay-a"
+BUILD = ROOT / ".build"
+DEFAULT_REPO = "https://github.com/johannesnorbertwolf/academic-skills-essay-a"
 
 AI_OPEN = re.compile(r"\[\[AI:(\d+)\]\]")
 AI_CLOSE = "[[/AI]]"
+
+
+def split_front_matter(text):
+    m = re.match(r"\s*---\s*\n(.*?)\n---\s*\n?", text, re.S)
+    if not m:
+        return {}, text
+    meta = {}
+    for line in m.group(1).splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        meta[key.strip().lower()] = value.strip().strip('"').strip("'")
+    return meta, text[m.end():]
 
 
 def parse_prompts(text):
@@ -25,9 +47,8 @@ def parse_prompts(text):
     parts = re.split(r"^##\s*Prompt\s+(\d+)\s*$", text, flags=re.M)
     for i in range(1, len(parts) - 1, 2):
         num = int(parts[i])
-        body = parts[i + 1]
         snippet = ""
-        for line in body.splitlines():
+        for line in parts[i + 1].splitlines():
             line = line.strip().lstrip(">").strip()
             if line and not line.startswith("**"):
                 snippet = line
@@ -35,6 +56,8 @@ def parse_prompts(text):
         prompts[num] = snippet
     return prompts
 
+
+# --------------------------------------------------------------------- HTML
 
 def emphasise(text):
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
@@ -59,7 +82,7 @@ def ai_span(text, num, prompts):
     )
 
 
-def inline(text, prompts):
+def inline_html(text, prompts):
     out = []
     human_words = ai_words = 0
     pos = 0
@@ -85,7 +108,7 @@ def inline(text, prompts):
     return "".join(out), human_words, ai_words
 
 
-def render(md, prompts):
+def render_html(md, prompts):
     lines = md.split("\n")
     parts = []
     human_words = ai_words = 0
@@ -102,7 +125,7 @@ def render(md, prompts):
             continue
         m = re.match(r"^(#{1,6})\s+(.*)$", s)
         if m:
-            inner, h, a = inline(m.group(2), prompts)
+            inner, h, a = inline_html(m.group(2), prompts)
             human_words += h
             ai_words += a
             parts.append("<h%d>%s</h%d>" % (len(m.group(1)), inner, len(m.group(1))))
@@ -113,7 +136,7 @@ def render(md, prompts):
             while i < n and lines[i].strip().startswith(">"):
                 block.append(lines[i].strip()[1:].strip())
                 i += 1
-            inner, h, a = inline(" ".join(block), prompts)
+            inner, h, a = inline_html(" ".join(block), prompts)
             human_words += h
             ai_words += a
             parts.append("<blockquote><p>%s</p></blockquote>" % inner)
@@ -122,7 +145,7 @@ def render(md, prompts):
             items = []
             while i < n and re.match(r"^[-*]\s+", lines[i].strip()):
                 item = re.sub(r"^[-*]\s+", "", lines[i].strip())
-                inner, h, a = inline(item, prompts)
+                inner, h, a = inline_html(item, prompts)
                 human_words += h
                 ai_words += a
                 items.append("<li>%s</li>" % inner)
@@ -133,7 +156,7 @@ def render(md, prompts):
             items = []
             while i < n and re.match(r"^\d+\.\s+", lines[i].strip()):
                 item = re.sub(r"^\d+\.\s+", "", lines[i].strip())
-                inner, h, a = inline(item, prompts)
+                inner, h, a = inline_html(item, prompts)
                 human_words += h
                 ai_words += a
                 items.append("<li>%s</li>" % inner)
@@ -154,7 +177,7 @@ def render(md, prompts):
                 break
             para.append(t)
             i += 1
-        inner, h, a = inline(" ".join(para), prompts)
+        inner, h, a = inline_html(" ".join(para), prompts)
         human_words += h
         ai_words += a
         parts.append("<p>%s</p>" % inner)
@@ -197,29 +220,26 @@ footer a{color:#2f6fd0;}
 """
 
 
-def page(title, mode, body, human_words, ai_words, prompts):
+def html_page(meta, mode, body, human_words, ai_words):
+    title = meta.get("title", "Essay")
+    repo = meta.get("repo", DEFAULT_REPO)
     total = human_words + ai_words
     if total:
         hp = round(100 * human_words / total)
-        ap = 100 - hp
         summary = (
             "%d words in total &middot; <strong>%d (%d%%) written by Johannes Wolf</strong> "
-            "&middot; %d (%d%%) written by the AI" % (total, human_words, hp, ai_words, ap)
+            "&middot; %d (%d%%) written by the AI" % (total, human_words, hp, ai_words, 100 - hp)
         )
     else:
         summary = "No text yet."
     note = (
-        "<p class=\"lede\"><strong>Printable version.</strong> Print this page and enable "
+        '<p class="lede"><strong>Printable version.</strong> Print this page and enable '
         "&ldquo;background graphics&rdquo; so the colours are kept. Light green is the human "
         "author; light blue with a dashed underline is the AI.</p>"
         if mode == "print"
         else ""
     )
-    hover = (
-        ""
-        if mode == "print"
-        else " Hover any blue passage to see which prompt produced it."
-    )
+    hover = "" if mode == "print" else " Hover any blue passage to see which prompt produced it."
     return """<!doctype html>
 <html lang="en">
 <head>
@@ -230,7 +250,7 @@ def page(title, mode, body, human_words, ai_words, prompts):
 </head>
 <body>
 <header>
-<h1>Academic Skills Essay A &mdash; who wrote what</h1>
+<h1>%s &mdash; who wrote what</h1>
 <p class="lede">Every word is labelled. This page is generated from the master text
 (<code>essay.md</code>) and cannot disagree with it.%s</p>
 %s
@@ -252,32 +272,238 @@ def page(title, mode, body, human_words, ai_words, prompts):
 """ % (
         html.escape(title),
         STYLE,
+        html.escape(title),
         hover,
         note,
         summary,
         body,
         date.today().isoformat(),
-        REPO_URL,
-        REPO_URL,
+        html.escape(repo, quote=True),
+        html.escape(repo),
     )
+
+
+# -------------------------------------------------------------------- Typst
+
+TYPST_SPECIAL = set("\\#$~*_`<>@[]")
+
+
+def tesc(text):
+    return "".join(("\\" + c) if c in TYPST_SPECIAL else c for c in text)
+
+
+def fmt_chunk(text):
+    pattern = re.compile(r"\*\*(.+?)\*\*|\*(.+?)\*|\[@([^\]]+)\]", re.S)
+    pieces = []
+    pos = 0
+    for m in pattern.finditer(text):
+        pieces.append(("text", text[pos:m.start()]))
+        if m.group(1) is not None:
+            pieces.append(("bold", m.group(1)))
+        elif m.group(2) is not None:
+            pieces.append(("italic", m.group(2)))
+        else:
+            pieces.append(("cite", m.group(3)))
+        pos = m.end()
+    pieces.append(("text", text[pos:]))
+    out = []
+    for kind, value in pieces:
+        if kind == "text":
+            out.append(tesc(value))
+        elif kind == "bold":
+            out.append("*" + tesc(value) + "*")
+        elif kind == "italic":
+            out.append("_" + tesc(value) + "_")
+        else:
+            keys = [k for k in re.findall(r"[\w:.\-]+", value) if k]
+            out.append(" ".join("#cite(<%s>)" % k for k in keys))
+    return "".join(out)
+
+
+def inline_typst(text):
+    text = AI_OPEN.sub(" ", text).replace(AI_CLOSE, " ")
+    text = re.sub(r"[ \t]+", " ", text)
+    return fmt_chunk(text)
+
+
+def render_typst_body(md):
+    lines = md.split("\n")
+    out = []
+    i = 0
+    n = len(lines)
+    while i < n:
+        s = lines[i].strip()
+        if s == "":
+            i += 1
+            continue
+        if re.match(r"^---+$", s):
+            out.append("#line(length: 100%)")
+            i += 1
+            continue
+        m = re.match(r"^(#{1,6})\s+(.*)$", s)
+        if m:
+            out.append("=" * len(m.group(1)) + " " + inline_typst(m.group(2)))
+            i += 1
+            continue
+        if s.startswith(">"):
+            block = []
+            while i < n and lines[i].strip().startswith(">"):
+                block.append(lines[i].strip()[1:].strip())
+                i += 1
+            out.append("#block(inset: (left: 0.5in))[%s]" % inline_typst(" ".join(block)))
+            continue
+        if re.match(r"^[-*]\s+", s):
+            items = []
+            while i < n and re.match(r"^[-*]\s+", lines[i].strip()):
+                item = re.sub(r"^[-*]\s+", "", lines[i].strip())
+                items.append("- " + inline_typst(item))
+                i += 1
+            out.append("\n".join(items))
+            continue
+        if re.match(r"^\d+\.\s+", s):
+            items = []
+            while i < n and re.match(r"^\d+\.\s+", lines[i].strip()):
+                item = re.sub(r"^\d+\.\s+", "", lines[i].strip())
+                items.append("+ " + inline_typst(item))
+                i += 1
+            out.append("\n".join(items))
+            continue
+        para = []
+        while i < n:
+            t = lines[i].strip()
+            if (
+                t == ""
+                or t.startswith("#")
+                or t.startswith(">")
+                or re.match(r"^[-*]\s+", t)
+                or re.match(r"^\d+\.\s+", t)
+                or re.match(r"^---+$", t)
+            ):
+                break
+            para.append(t)
+            i += 1
+        text = inline_typst(" ".join(para))
+        if text[:1] in ("-", "+", "/", "="):
+            text = "\\" + text
+        out.append(text)
+    return "\n\n".join(out)
+
+
+TYPST_TEMPLATE = r'''#set page(
+  paper: "@@PAPERSIZE@@",
+  margin: 1in,
+  numbering: none,
+  header: context {
+    set text(font: "@@FONT@@", size: 12pt)
+    align(right, counter(page).display("1"))
+  },
+)
+#set text(font: "@@FONT@@", size: 12pt, lang: "en")
+#set par(leading: 1em, first-line-indent: (amount: 0.5in, all: true), justify: false)
+
+#show heading.where(level: 1): it => block(above: 1.2em, below: 0.6em, align(center, text(weight: "bold", it.body)))
+#show heading.where(level: 2): it => block(above: 1.2em, below: 0.6em, text(weight: "bold", it.body))
+#show heading.where(level: 3): it => block(above: 1.2em, below: 0.6em, text(weight: "bold", style: "italic", it.body))
+
+#show bibliography: set par(first-line-indent: (amount: 0.5in, all: true), hanging-indent: 0.5in)
+
+// ------------------------------------------------- title page
+#v(2.5in)
+#align(center)[#text(weight: "bold")[@@TITLE@@]]
+#v(1.5em)
+#align(center)[
+  @@STACK@@
+]
+#v(1fr)
+#align(center)[#text(size: 10pt)[Transparency record: every word is attributed and every prompt is logged at @@REPO@@]]
+
+#pagebreak()
+
+// ------------------------------------------------- body
+#align(center)[#text(weight: "bold")[@@TITLE@@]]
+
+@@BODY@@
+
+@@REFERENCES@@
+'''
+
+PAPER_SIZES = {"a4": "a4", "letter": "us-letter", "us-letter": "us-letter", "usletter": "us-letter"}
+
+
+def typst_document(meta, body, has_cites):
+    stack_lines = [
+        meta.get("author", ""),
+        meta.get("affiliation", ""),
+        meta.get("course", ""),
+        meta.get("instructor", ""),
+        meta.get("date", ""),
+    ]
+    stack = " \\\n  ".join(tesc(x) for x in stack_lines if x)
+    references = ""
+    if has_cites:
+        references = (
+            "#pagebreak()\n"
+            "#align(center)[#text(weight: \"bold\")[References]]\n\n"
+            '#bibliography("../refs.bib", style: "apa")'
+        )
+    doc = TYPST_TEMPLATE
+    replacements = {
+        "@@PAPERSIZE@@": PAPER_SIZES.get(meta.get("papersize", "a4").lower(), "a4"),
+        "@@FONT@@": meta.get("font", "Times New Roman"),
+        "@@TITLE@@": tesc(meta.get("title", "Essay")),
+        "@@STACK@@": stack,
+        "@@REPO@@": tesc(meta.get("repo", DEFAULT_REPO)),
+        "@@BODY@@": body,
+        "@@REFERENCES@@": references,
+    }
+    for key, value in replacements.items():
+        doc = doc.replace(key, value)
+    return doc
+
+
+def build_pdf(meta, md):
+    if shutil.which("typst") is None:
+        print("Typst not found; skipping the APA PDF.")
+        return
+    body = render_typst_body(md)
+    has_cites = "#cite(" in body and REFS.exists() and bool(REFS.read_text(encoding="utf-8").strip())
+    BUILD.mkdir(exist_ok=True)
+    DOCS.mkdir(exist_ok=True)
+    typ_path = BUILD / "paper.typ"
+    typ_path.write_text(typst_document(meta, body, has_cites), encoding="utf-8")
+    out = DOCS / "essay.pdf"
+    result = subprocess.run(
+        ["typst", "compile", "--root", str(ROOT), str(typ_path), str(out)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print("Typst could not build the PDF:")
+        print(result.stderr.strip())
+    else:
+        if result.stderr.strip():
+            print(result.stderr.strip())
+        print("Built docs/essay.pdf")
 
 
 def main():
-    md = SRC.read_text(encoding="utf-8")
-    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
+    raw = SRC.read_text(encoding="utf-8")
+    meta, body_md = split_front_matter(raw)
+    md = re.sub(r"<!--.*?-->", "", body_md, flags=re.S)
     prompts = parse_prompts(PROMPTS.read_text(encoding="utf-8")) if PROMPTS.exists() else {}
-    body, human_words, ai_words = render(md, prompts)
+    body, human_words, ai_words = render_html(md, prompts)
     DOCS.mkdir(exist_ok=True)
     (DOCS / "index.html").write_text(
-        page("Academic Skills Essay A", "screen", body, human_words, ai_words, prompts),
-        encoding="utf-8",
+        html_page(meta, "screen", body, human_words, ai_words), encoding="utf-8"
     )
     (DOCS / "print.html").write_text(
-        page("Academic Skills Essay A (print)", "print", body, human_words, ai_words, prompts),
-        encoding="utf-8",
+        html_page(meta, "print", body, human_words, ai_words), encoding="utf-8"
     )
-    print("Built docs/index.html and docs/print.html: %d human words, %d AI words."
-          % (human_words, ai_words))
+    print(
+        "Built docs/index.html and docs/print.html: %d human words, %d AI words."
+        % (human_words, ai_words)
+    )
+    build_pdf(meta, md)
 
 
 if __name__ == "__main__":
