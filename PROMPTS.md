@@ -52,6 +52,22 @@ Answer: Just a link to the repo.
 **AI question — "Which tool should generate the final APA PDF?"**
 Answer: "if typst handles references then that." (Typst does, so Typst it is.)
 
+### 28 September 2026 — locating sources and planning the essay
+
+**AI question — "Which file do you mean by the reader for your Academic Skills class?"**
+Answer: `Syllabus Academic Skills (2026-2027).pdf` (61 pages).
+
+**AI question — "For each of your prompts, what should DIALOGUE.md record?"**
+Answer: "Only the concluding message per prompt."
+
+**AI question — "Which three strategies should the body cover?"**
+Answer: "Let's hold on. This decision, I will make myself."
+
+**AI question — "Given the course treats outsourced writing as cheating, how do you want to proceed?"**
+Answer: "So first of all, it clearly isn't cheating or fraud if everyhting is
+transparent. I do realize the risk of failing the assignment, but I think it's
+fun to test what is allowed and what isn't."
+
 ---
 
 ## Prompts
