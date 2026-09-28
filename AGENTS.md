@@ -12,6 +12,14 @@ was made, so the rules matter as much as the essay.
 - The body of the commit message must quote the user's prompt **verbatim**, so
   the git history is a faithful record of every instruction, not a paraphrase.
 
+## Before each commit
+
+- Regenerate every derived file so the record is current, then commit them
+  together with the change:
+  - `build.py` — the web page, printable page, APA PDF and `WORDCOUNT.md`.
+  - `costs.py` — `COSTS.md`.
+  - `dialogue.py` — `DIALOGUE.md`.
+
 ## Never commit copyrighted material
 
 - The course materials and papers in `sources/` are gitignored and must never be

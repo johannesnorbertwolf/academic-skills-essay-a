@@ -6,7 +6,7 @@ concluding answer to it. The AI's internal reasoning and all tool activity
 
 Generated from the local opencode session database by `dialogue.py`.
 
-Last updated: 2026-09-28 15:03
+Last updated: 2026-09-28 15:14
 
 ---
 
@@ -181,4 +181,73 @@ Last updated: 2026-09-28 15:03
 
 **AI:**
 
-> You chose the concluding message, so I'll implement exactly that: the AI's final reply per prompt, with the trade-off you accepted. Reverting to that rule.
+> Done. Past answers are recovered, and the log now updates automatically going forward.
+>
+> **What was added**
+>
+> - `dialogue.py` reads the opencode session database and writes `DIALOGUE.md`: every prompt you typed, with my concluding answer, leaving out the reasoning and tool activity.
+> - It worked retroactively for all nine prompts, so the earlier exchanges are included.
+> - `AGENTS.md` now requires keeping it current, and the README explains it.
+>
+> **Two honest caveats**
+>
+> 1. As you accepted, the "concluding message" rule loses the real answer in two spots: exchange 2 ends on a confirmation instead of the list of PDF options, and exchange 3 ends on a status line instead of the answer about documenting the Q&A. I can swap just those to the full reply if you want.
+> 2. There's a one-turn lag: the answer to your current prompt only appears the next time the script runs, since my reply is written after the tool runs.
+>
+> Want me to fix those two exchanges, or leave the rule exactly as it is?
+
+---
+
+## Exchange 10 — 2026-09-28 15:05
+
+**Johannes:**
+
+> It's fine as is. One more thing, as you can see, the essay has to be 700 to 1000 words not including all the appendix stuff (reflection, statement on ai usage) and headers. can you please always keep track of the number of words somewhere. My goal is to write about 800 words without being strict about it. 700 to 1000 are a hard requirement though.
+
+**AI:**
+
+> Done — the word count is now tracked automatically.
+>
+> **How it works**
+>
+> - Only the essay body counts. Headings are excluded, and counting stops at the first heading containing "Appendix", "Reflection", or "AI use" — so the reflection and the statement on AI usage are automatically left out, as is the reference list.
+> - The count appears in three places: the build output, a committed `WORDCOUNT.md`, and the top of the generated web/print pages.
+> - The limits live in the master file's settings, currently target 800, minimum 700, maximum 1000, so they're easy to change if the brief shifts.
+>
+> **Right now** the body is empty, so it reports 0 words and the status "UNDER the minimum". I verified the counting with a test sample containing headings, AI-tagged text, and an appendix: it counted the body correctly and ignored the headings and appendix.
+>
+> **One convention to remember:** put the reflection and the AI statement under a heading that includes "Appendix", "Reflection", or "AI use", and they'll be excluded automatically.
+>
+> So while we write, I'll keep an eye on it and flag if we drift outside 700–1000. Ready to start the essay whenever you are.
+
+---
+
+## Exchange 11 — 2026-09-28 15:07
+
+**Johannes:**
+
+> okay, now let's discuss the outline. Please read the requirements thoroughly and make a proposal.
+
+**AI:**
+
+> Logged — the new Q&A, including your decision to pick the strategies yourself and your reasoning about the policy, is now in `PROMPTS.md` and pushed. Your call on the policy stands; I've simply made it part of the record.
+>
+> So the outline is ready to be filled in as soon as you choose the three strategies. A few ways I can help from here, whichever you prefer:
+>
+> - Talk through candidate strategies from the two articles so you can decide (I'll lay out the options and trade-offs without choosing for you).
+> - Once you've chosen, turn the outline into a detailed paragraph-by-paragraph plan with a word budget per section.
+> - Or write up the assignment requirements as a short committed `ASSIGNMENT.md` in your own repo, so the brief you're working to is part of the public record too.
+>
+> What would you like next?
+
+---
+
+## Exchange 12 — 2026-09-28 15:14
+
+**Johannes:**
+
+> Apparently, the cost md doesn't update. it's still at 2 cents.
+
+**AI:**
+
+> The script works — it just has to be run; it doesn't update on its own. The database now shows about 9.7 cents, and running the script brings `COSTS.md` up to date. The real fix is to make regeneration part of every commit, so it can't go stale again.
