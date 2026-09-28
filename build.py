@@ -184,6 +184,92 @@ def render_html(md, prompts):
     return "\n".join(parts), human_words, ai_words
 
 
+def strip_ai_tags(text):
+    return re.sub(r"\s+", " ", AI_OPEN.sub(" ", text).replace(AI_CLOSE, " "))
+
+
+APPENDIX_RE = re.compile(r"\b(appendix|reflection)\b|ai (usage|use)|use of ai", re.I)
+
+
+def count_essay_words(md):
+    """Count the words that count toward the limit.
+
+    Headings are not counted, and neither is anything from the first
+    appendix/reflection/AI-statement heading onward. Everything before that is
+    the essay body.
+    """
+    lines = md.split("\n")
+    count = 0
+    in_appendix = False
+    i = 0
+    n = len(lines)
+    while i < n:
+        s = lines[i].strip()
+        if s == "" or re.match(r"^---+$", s):
+            i += 1
+            continue
+        m = re.match(r"^(#{1,6})\s+(.*)$", s)
+        if m:
+            if APPENDIX_RE.search(m.group(2)):
+                in_appendix = True
+            i += 1
+            continue
+        if s.startswith(">"):
+            block = []
+            while i < n and lines[i].strip().startswith(">"):
+                block.append(lines[i].strip()[1:].strip())
+                i += 1
+            if not in_appendix:
+                count += len(strip_ai_tags(" ".join(block)).split())
+            continue
+        if re.match(r"^[-*]\s+", s) or re.match(r"^\d+\.\s+", s):
+            while i < n and (
+                re.match(r"^[-*]\s+", lines[i].strip())
+                or re.match(r"^\d+\.\s+", lines[i].strip())
+            ):
+                item = re.sub(r"^[-*]\s+", "", lines[i].strip())
+                item = re.sub(r"^\d+\.\s+", "", item)
+                if not in_appendix:
+                    count += len(strip_ai_tags(item).split())
+                i += 1
+            continue
+        para = []
+        while i < n:
+            t = lines[i].strip()
+            if (
+                t == ""
+                or t.startswith("#")
+                or t.startswith(">")
+                or re.match(r"^[-*]\s+", t)
+                or re.match(r"^\d+\.\s+", t)
+                or re.match(r"^---+$", t)
+            ):
+                break
+            para.append(t)
+            i += 1
+        if not in_appendix:
+            count += len(strip_ai_tags(" ".join(para)).split())
+    return count
+
+
+def word_limits(meta):
+    def as_int(key, default):
+        try:
+            return int(meta.get(key, default))
+        except (ValueError, TypeError):
+            return default
+
+    return as_int("word_min", 700), as_int("word_max", 1000), as_int("word_target", 800)
+
+
+def word_state(count, lo, hi):
+    if count < lo:
+        return "UNDER the minimum"
+    if count > hi:
+        return "OVER the maximum"
+    return "within the required range"
+
+
 STYLE = """
 :root{--human-bg:#e6f6e6;--human-bg-hover:#d3efd3;--ai-bg:#e3f0ff;--ai-bg-hover:#cfe4ff;
 --ai-line:#2f6fd0;--ink:#1a1a1a;}
@@ -220,18 +306,25 @@ footer a{color:#2f6fd0;}
 """
 
 
-def html_page(meta, mode, body, human_words, ai_words):
+def html_page(meta, mode, body, human_words, ai_words, essay_words):
     title = meta.get("title", "Essay")
     repo = meta.get("repo", DEFAULT_REPO)
     total = human_words + ai_words
     if total:
         hp = round(100 * human_words / total)
         summary = (
-            "%d words in total &middot; <strong>%d (%d%%) written by Johannes Wolf</strong> "
+            "Whole document: %d words &middot; <strong>%d (%d%%) written by Johannes Wolf</strong> "
             "&middot; %d (%d%%) written by the AI" % (total, human_words, hp, ai_words, 100 - hp)
         )
     else:
         summary = "No text yet."
+    lo, hi, target = word_limits(meta)
+    state = word_state(essay_words, lo, hi)
+    essay_line = (
+        "Essay body (counted toward the word limit): <strong>%d words</strong> "
+        "&middot; target %d, required %d&ndash;%d &middot; <strong>%s</strong>"
+        % (essay_words, target, lo, hi, state)
+    )
     note = (
         '<p class="lede"><strong>Printable version.</strong> Print this page and enable '
         "&ldquo;background graphics&rdquo; so the colours are kept. Light green is the human "
@@ -259,6 +352,7 @@ def html_page(meta, mode, body, human_words, ai_words):
 <span class="item"><span class="swatch ai"></span> Written by the AI</span>
 </div>
 <p class="summary">%s</p>
+<p class="summary">%s</p>
 </header>
 <main>
 %s
@@ -276,6 +370,7 @@ def html_page(meta, mode, body, human_words, ai_words):
         hover,
         note,
         summary,
+        essay_line,
         body,
         date.today().isoformat(),
         html.escape(repo, quote=True),
@@ -486,22 +581,51 @@ def build_pdf(meta, md):
         print("Built docs/essay.pdf")
 
 
+def write_wordcount(meta, count):
+    lo, hi, target = word_limits(meta)
+    state = word_state(count, lo, hi)
+    lines = [
+        "# Word count",
+        "",
+        "The essay body only: the main text. Headings are not counted, and neither",
+        "is anything from the appendix onward (the reflection and the statement on AI",
+        "use). The reference list is generated separately and is not counted either.",
+        "This matches the assignment's rules.",
+        "",
+        "- **Current essay body: %d words**" % count,
+        "- Target: about %d words" % target,
+        "- Hard requirement: %d to %d words" % (lo, hi),
+        "- Status: **%s**" % state,
+        "",
+        "Generated by `build.py` on %s." % date.today().isoformat(),
+        "",
+    ]
+    (ROOT / "WORDCOUNT.md").write_text("\n".join(lines), encoding="utf-8")
+
+
 def main():
     raw = SRC.read_text(encoding="utf-8")
     meta, body_md = split_front_matter(raw)
     md = re.sub(r"<!--.*?-->", "", body_md, flags=re.S)
     prompts = parse_prompts(PROMPTS.read_text(encoding="utf-8")) if PROMPTS.exists() else {}
     body, human_words, ai_words = render_html(md, prompts)
+    essay_words = count_essay_words(md)
+    lo, hi, target = word_limits(meta)
     DOCS.mkdir(exist_ok=True)
     (DOCS / "index.html").write_text(
-        html_page(meta, "screen", body, human_words, ai_words), encoding="utf-8"
+        html_page(meta, "screen", body, human_words, ai_words, essay_words), encoding="utf-8"
     )
     (DOCS / "print.html").write_text(
-        html_page(meta, "print", body, human_words, ai_words), encoding="utf-8"
+        html_page(meta, "print", body, human_words, ai_words, essay_words), encoding="utf-8"
     )
+    write_wordcount(meta, essay_words)
     print(
         "Built docs/index.html and docs/print.html: %d human words, %d AI words."
         % (human_words, ai_words)
+    )
+    print(
+        "Essay body: %d words (target %d, required %d-%d) \u2014 %s."
+        % (essay_words, target, lo, hi, word_state(essay_words, lo, hi))
     )
     build_pdf(meta, md)
 

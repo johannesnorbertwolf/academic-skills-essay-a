@@ -24,6 +24,16 @@ was made, so the rules matter as much as the essay.
   (coloured web page, printable page, APA PDF).
 - Cite sources as `[@key]`, with entries in `refs.bib`.
 
+## Word count
+
+- The essay body must be **700 to 1000 words**; aim for about 800, without being
+  strict. This is a hard requirement.
+- Only the essay body counts. Headings are excluded, and so is everything from
+  the appendix onward (the reflection and the statement on AI use). The
+  reference list does not count either.
+- `build.py` reports the count and writes it to `WORDCOUNT.md`. Keep an eye on
+  it while writing and keep the file current.
+
 ## Transparency record
 
 - Record every prompt sent to the AI in `PROMPTS.md`, together with the AI's

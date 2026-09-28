@@ -50,11 +50,14 @@ Everything is generated from three things:
 5. **`DIALOGUE.md`** — every prompt Johannes typed while building the project,
    with the AI's concluding answer to each, without the hidden reasoning or
    tool activity.
+6. **`WORDCOUNT.md`** — the running word count of the essay body, kept against
+   the required 700–1000 words. Headings and the appendix (reflection, statement
+   on AI use) do not count.
 
 `build.py` turns the master text into the coloured web page, the printable
-version, and the APA PDF. `costs.py` regenerates `COSTS.md`, and `dialogue.py`
-regenerates `DIALOGUE.md`. Nobody edits any of those by hand, so they cannot
-quietly disagree with the master text.
+version, the APA PDF, and `WORDCOUNT.md`. `costs.py` regenerates `COSTS.md`, and
+`dialogue.py` regenerates `DIALOGUE.md`. Nobody edits any of those by hand, so
+they cannot quietly disagree with the master text.
 
 ## Sources
 

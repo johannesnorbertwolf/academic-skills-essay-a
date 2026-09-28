@@ -9,6 +9,9 @@ paper: student
 papersize: a4
 font: Times New Roman
 repo: https://github.com/johannesnorbertwolf/academic-skills-essay-a
+word_target: 800
+word_min: 700
+word_max: 1000
 ---
 
 <!--
@@ -29,4 +32,10 @@ Headings become APA headings in the PDF:
 
 The title-page details (title, author, course, instructor, date, ...) live in
 the block at the very top of this file, between the two --- lines.
+
+Word count: the required 700-1000 words count the essay body only. Headings are
+not counted, and neither is anything from the appendix onward. Put the appendix
+material (reflection, statement on AI use) under a heading that contains the
+word "Appendix", "Reflection", or "AI use", and everything from there down is
+left out of the count. `build.py` writes the running total to WORDCOUNT.md.
 -->
