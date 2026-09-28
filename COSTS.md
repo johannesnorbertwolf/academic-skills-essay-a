@@ -4,7 +4,7 @@ How much the AI assistance in this project actually cost, in tokens and in
 money. This file is generated from the local opencode session database by
 `costs.py`; the numbers are read from the tool, not typed by hand.
 
-Last updated: 2026-09-28 15:45
+Last updated: 2026-09-28 15:48
 
 Model: `deepseek-v4-flash (deepseek)`
 
@@ -13,19 +13,19 @@ Model: `deepseek-v4-flash (deepseek)`
 | Metric | Value |
 | --- | --- |
 | Sessions | 1 |
-| Input tokens | 107,477 |
-| Output tokens | 56,637 |
-| Reasoning tokens | 146,174 |
-| Cache-read tokens | 29,428,480 |
+| Input tokens | 110,224 |
+| Output tokens | 59,053 |
+| Reasoning tokens | 151,488 |
+| Cache-read tokens | 33,498,112 |
 | Cache-write tokens | 0 |
-| **Total tokens (all kinds)** | **29,738,768** |
-| **API spend (USD)** | **$0.1542** |
+| **Total tokens (all kinds)** | **33,818,877** |
+| **API spend (USD)** | **$0.1682** |
 
 ## Per session
 
 | Session | Started | Input | Output | Reasoning | Cache read | Cache write | Cost (USD) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| ses_f17f91a40ffenBLUPW4wByHmy9 | 2026-09-28 14:39 | 107,477 | 56,637 | 146,174 | 29,428,480 | 0 | $0.1542 |
+| ses_f17f91a40ffenBLUPW4wByHmy9 | 2026-09-28 14:39 | 110,224 | 59,053 | 151,488 | 33,498,112 | 0 | $0.1682 |
 
 Notes: cache-read tokens are reused context and are charged at a much lower
 rate than fresh input, so the token total is larger than the spend might
