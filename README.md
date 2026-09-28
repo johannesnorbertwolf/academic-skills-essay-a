@@ -79,6 +79,8 @@ by word.
 - The APA PDF and its reference list are generated from `essay.md` and
   `refs.bib`, so the citations and the references always match.
 - `COSTS.md` is read from the tool's own usage records, not estimated.
+- Each commit corresponds to a single instruction, so the history reads as a
+  step-by-step log of how the essay was made.
 
 ## Rebuilding everything
 
