@@ -188,7 +188,17 @@ def strip_ai_tags(text):
     return re.sub(r"\s+", " ", AI_OPEN.sub(" ", text).replace(AI_CLOSE, " "))
 
 
-APPENDIX_RE = re.compile(r"\b(appendix|reflection)\b|ai (usage|use)|use of ai", re.I)
+APPENDIX_RE = re.compile(r"\b(appendix|reflection|disclosure)\b|ai (usage|use)|use of ai", re.I)
+
+
+def split_appendix(md):
+    """Split the text at the first appendix/reflection/disclosure heading."""
+    lines = md.split("\n")
+    for i, line in enumerate(lines):
+        m = re.match(r"^(#{1,6})\s+(.*)$", line.strip())
+        if m and APPENDIX_RE.search(m.group(2)):
+            return "\n".join(lines[:i]), "\n".join(lines[i:])
+    return md, ""
 
 
 def count_essay_words(md):
@@ -520,12 +530,14 @@ TYPST_TEMPLATE = r'''#set page(
 @@BODY@@
 
 @@REFERENCES@@
+
+@@APPENDIX@@
 '''
 
 PAPER_SIZES = {"a4": "a4", "letter": "us-letter", "us-letter": "us-letter", "usletter": "us-letter"}
 
 
-def typst_document(meta, body, has_cites):
+def typst_document(meta, body, appendix, has_cites):
     stack_lines = [
         meta.get("author", ""),
         meta.get("affiliation", ""),
@@ -550,6 +562,7 @@ def typst_document(meta, body, has_cites):
         "@@REPO@@": tesc(meta.get("repo", DEFAULT_REPO)),
         "@@BODY@@": body,
         "@@REFERENCES@@": references,
+        "@@APPENDIX@@": appendix,
     }
     for key, value in replacements.items():
         doc = doc.replace(key, value)
@@ -560,12 +573,14 @@ def build_pdf(meta, md):
     if shutil.which("typst") is None:
         print("Typst not found; skipping the APA PDF.")
         return
-    body = render_typst_body(md)
+    main_md, appendix_md = split_appendix(md)
+    body = render_typst_body(main_md)
+    appendix = render_typst_body(appendix_md) if appendix_md.strip() else ""
     has_cites = "#cite(" in body and REFS.exists() and bool(REFS.read_text(encoding="utf-8").strip())
     BUILD.mkdir(exist_ok=True)
     DOCS.mkdir(exist_ok=True)
     typ_path = BUILD / "paper.typ"
-    typ_path.write_text(typst_document(meta, body, has_cites), encoding="utf-8")
+    typ_path.write_text(typst_document(meta, body, appendix, has_cites), encoding="utf-8")
     out = DOCS / "essay.pdf"
     result = subprocess.run(
         ["typst", "compile", "--root", str(ROOT), str(typ_path), str(out)],
@@ -608,7 +623,11 @@ def main():
     meta, body_md = split_front_matter(raw)
     md = re.sub(r"<!--.*?-->", "", body_md, flags=re.S)
     prompts = parse_prompts(PROMPTS.read_text(encoding="utf-8")) if PROMPTS.exists() else {}
-    body, human_words, ai_words = render_html(md, prompts)
+    main_md, appendix_md = split_appendix(md)
+    main_html, h1, a1 = render_html(main_md, prompts)
+    appendix_html, h2, a2 = render_html(appendix_md, prompts) if appendix_md.strip() else ("", 0, 0)
+    body = main_html + ("\n" + appendix_html if appendix_html else "")
+    human_words, ai_words = h1 + h2, a1 + a2
     essay_words = count_essay_words(md)
     lo, hi, target = word_limits(meta)
     DOCS.mkdir(exist_ok=True)
