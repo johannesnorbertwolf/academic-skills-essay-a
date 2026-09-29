@@ -1,5 +1,7 @@
 # Academic Skills Essay A — who wrote what
 
+## **[Read the colour-coded essay here: who wrote what →](https://johannesnorbertwolf.github.io/academic-skills-essay-a/)**
+
 This repository contains an essay, and a complete, word-level record of which
 parts were written by the human author (Johannes Wolf) and which parts were
 written by an AI.
@@ -12,7 +14,8 @@ is visible to anyone.
 
 Three versions are produced automatically from the same master text:
 
-- **Coloured web page:** open `docs/index.html` (or the published website).
+- **Coloured web page:** open the published website,
+  <https://johannesnorbertwolf.github.io/academic-skills-essay-a/> (or `docs/index.html`).
   Hover over any coloured passage to see which prompt produced it.
 - **Printable version:** open `docs/print.html` and print it (enable
   "background graphics" so the colours show). It works on paper too.
