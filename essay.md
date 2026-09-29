@@ -50,15 +50,15 @@ As a university student, you spend many hours studying. Yet, many students are s
 
 ## [[AI:22]]Retrieval Practice[[/AI]]
 
-[[AI:20]]The second strategy is retrieval practice: recalling information from memory rather than merely reviewing it. A well-known form is the read–recite–review method, in which a student reads a passage, recites the main ideas from memory, and then reviews the passage to check what was missed [@putnam2016]. Other implementations include answering one's own questions and using flashcards, provided that the answer is produced from memory before it is checked [@miyatsu2018]. In practice, this means that a student might read a section, close the book, write down everything that can be remembered, and only then check the text. Practice testing is among the most effective techniques available, because retrieving information strengthens the memory for it and simultaneously reveals gaps that require further study [@putnam2016]. The obstacle is that retrieval practice feels harder and slower than rereading, while rereading produces a misleading impression of knowing. Students should therefore trust the evidence rather than their feeling of fluency, and should always check their answers and revisit material they could not recall. Applied consistently, retrieval practice turns studying into an active process in which each attempt to remember strengthens later performance.[[/AI]]
+<!-- Johannes: write the first draft of this section below, then the AI edits it. -->
 
 ## [[AI:22]]Spaced Practice[[/AI]]
 
-[[AI:20]]The third strategy is spaced practice: distributing study over time instead of concentrating it into a single session. Cramming may produce acceptable performance in the short term, but spaced study leads to far more durable learning, and it requires no more total time [@putnam2016]. Spacing is also central to the recommendations for the popular strategies that students already use, where repetitions distributed across days improve retention [@miyatsu2018]. To implement it, a student can study each subject a little on most days, revisit earlier topics in later sessions, and plan these sessions in advance. The main obstacles are habit and time pressure: cramming feels productive because it produces rapid gains, and it is the default response when deadlines approach. Scheduling regular short sessions, and accepting that learning may feel slower at first, makes spacing easier to sustain over a semester. Spacing and retrieval practice work well together: each spaced session can begin with a short self-test of the material covered previously. Short, regular sessions are also less stressful than last-minute cramming.[[/AI]]
+<!-- Johannes: write the first draft of this section below, then the AI edits it. -->
 
 # [[AI:22]]Conclusion[[/AI]]
 
-[[AI:20]]University students can optimize their learning by replacing familiar but passive habits with strategies that actively engage memory and distribute effort over time. Pretesting prepares the memory before learning begins; retrieval practice, especially in the form of read–recite–review, strengthens memory by requiring information to be recalled; and spaced practice ensures that learning is consolidated over days rather than hours. Together, these techniques demand more effort than rereading or highlighting, but they produce the durable learning that university study requires. Improving the strategies students already use may offer some benefit, but the greater gain lies in adopting the strategies that the evidence supports.[[/AI]]
+<!-- Johannes: write the first draft of this section below, then the AI edits it. -->
 
 # [[AI:20]]AI disclosure statement[[/AI]]
 
