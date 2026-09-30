@@ -52,9 +52,9 @@ Prequizzing is becoming easier to practice. [@putnam2016] suggests that before a
 
 ## [[AI:22]]Retrieval Practice[[/AI]]
 
-The second strategy is retrieval practice: the reproduction or summarization of the study material after consuming it without looking at it. [[AI:48]]One implementation is the RRR-method, Read, Recite, Review, described in [@putnam2016]: the student reads the material (or visits the lecture), writes a summary from memory, and then reviews it against the original. The second step is the retrieval itself, and the important part is that the student reproduces the material from memory rather than copying it. This both reactivates what was learned and reveals what was missed.[[/AI]]
+The second strategy is retrieval practice: the reproduction or summarization of the study material after consuming it without looking at it. One implementation is the RRR-method, Read, Recite, Review, described in [@putnam2016]: the student visits the lecture or reads the material, writes a summary from memory, and lastly reviews it against the study material. The second step is the retrieval itself, and the important part is that the student reproduces the material from memory rather than copying it. This both reactivates what was learned and reveals what was missed.
 
-The student will not use the material for summarization but merely write down what they remember. [[AI:48]]This shows what they did not fully understand or remember.[[/AI]] In its classical implementation, none of the common study strategies discussed in [@miyatsu2018] make use of retrieval.
+The student will not use the material for summarization but merely write down what they remember. This shows what they did not fully understand or remember. In its classical implementation, none of the common study strategies discussed in [@miyatsu2018] make use of retrieval.
 
 As discussed in [@miyatsu2018], at least summarization and outlining can be altered in a way that makes use of retrieval by practicing these after studying the material from memory.
 
