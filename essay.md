@@ -70,7 +70,13 @@ Assuming university students are not merely studying to pass exams but are eager
  
 # [[AI:22]]Conclusion[[/AI]]
 
-<!-- Johannes: write the first draft of this section below, then the AI edits it. -->
+[[AI:42]]This paper examined[[/AI]] three study strategies from [@putnam2016]: pretesting, retrieval practice and spaced practice. The former two focus on retrieving prior and just acquired information; the latter is a strategy for allocating study time most efficiently. 
+
+Unlike the study strategies in [@miyatsu2018], the study strategies discussed in this paper are not chosen by popularity among students but by effectiveness. They do, however, have the disadvantage of needing more time in preplanning, a more conscious decision and commitment to stick to them as they may not be obvious or intuitive to students. 
+
+The technological advancements in AI can be of benefit to these study methods. For example, a student may feed their study material to a chatbot and have it create a pretesting quiz for them. In the RRR-method, they might ask an AI chatbot for feedback after the final review step of the method to make sure they didn't miss or misunderstand anything.
+
+The strategies discussed in this paper do not mean that a student has to spend more time studying. With these more efficient strategies they should get better results with the same amount of time studying. Alternatively, if a student is already happy with their results, these study strategies should enable them to spend less time studying for a similar result. [[AI:42]]Any time saved can be spent as they wish.[[/AI]]
 
 # [[AI:20]]AI disclosure statement[[/AI]]
 
