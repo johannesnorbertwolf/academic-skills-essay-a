@@ -29,8 +29,9 @@ was made, so the rules matter as much as the essay.
 
 - `essay.md` is the single source of truth for the essay text.
 - Never edit anything in `docs/` by hand. Regenerate it with `build.py`
-  (coloured web page, printable page, APA PDF).
-- Cite sources as `[@key]`, with entries in `refs.bib`.
+  (colored web page, printable page, APA PDF).
+- Cite sources as `[@key]` (parenthetical) or `@key` (narrative), with entries in
+  `refs.bib`.
 
 ## Editing the text by hand
 
@@ -41,8 +42,9 @@ Pages, which save in their own format). The conventions:
 - Wrap AI-written passages in a tag that names the prompt:
   `[[AI:N]] the AI text goes here [[/AI]]`, where N is the prompt number in
   `PROMPTS.md`.
-- Headings: `#` is APA level 1 (centred, bold), `##` level 2, `###` level 3.
-- Citations: `[@key]`, matching an entry in `refs.bib`.
+- Headings: `#` is APA level 1 (centered, bold), `##` level 2, `###` level 3.
+- Citations: `[@key]` renders parenthetically, `@key` narratively, matching an
+  entry in `refs.bib`.
 - Title-page details live in the front-matter block at the very top.
 
 After editing, regenerate the derived files (see "Before each commit") so the

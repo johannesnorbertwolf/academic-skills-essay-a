@@ -1,37 +1,37 @@
 # Academic Skills Essay A — who wrote what
 
-## **[Read the colour-coded essay here: who wrote what →](https://johannesnorbertwolf.github.io/academic-skills-essay-a/)**
+## **[Read the color-coded essay here: who wrote what →](https://johannesnorbertwolf.github.io/academic-skills-essay-a/)**
 
 This repository contains an essay, and a complete, word-level record of which
 parts were written by the human author (Johannes Wolf) and which parts were
 written by an AI.
 
 The point is simple: the author is **not** hiding that AI was used. Instead,
-every single word is labelled, every prompt is published, and the whole process
+every single word is labeled, every prompt is published, and the whole process
 is visible to anyone.
 
 ## How to read the essay
 
 Three versions are produced automatically from the same master text:
 
-- **Coloured web page:** open the published website,
+- **Colored web page:** open the published website,
   <https://johannesnorbertwolf.github.io/academic-skills-essay-a/> (or `docs/index.html`).
-  Hover over any coloured passage to see which prompt produced it.
+  Hover over any colored passage to see which prompt produced it.
 - **Printable version:** open `docs/print.html` and print it (enable
-  "background graphics" so the colours show). It works on paper too.
+  "background graphics" so the colors show). It works on paper too.
 - **The submission file:** `docs/essay.pdf` is the clean, APA 7 formatted essay
-  that is handed in. It carries no colouring — the transparency lives in this
+  that is handed in. It carries no coloring — the transparency lives in this
   repository, and the PDF points readers to it.
 
 ## The legend
 
-| Colour | Meaning |
+| Color | Meaning |
 | --- | --- |
 | Plain / light green | Written by **Johannes Wolf** |
 | Light blue with a dashed underline | Written by the **AI** |
 
 The AI passages also carry a dashed underline on purpose, so the distinction
-survives black-and-white printing and colour blindness.
+survives black-and-white printing and color blindness.
 
 A summary at the top of the rendered page states exactly how many words each
 side wrote, and what share of the essay that is.
@@ -54,7 +54,7 @@ Everything is generated from three things:
    the required 700–1000 words. Headings and the appendix (reflection, statement
    on AI use) do not count.
 
-`build.py` turns the master text into the coloured web page, the printable
+`build.py` turns the master text into the colored web page, the printable
 version, the APA PDF, and `WORDCOUNT.md`. `costs.py` regenerates `COSTS.md`, and
 `prompts.py` regenerates `PROMPTS.md`. Nobody edits any of those by hand, so
 they cannot quietly disagree with the master text.
@@ -79,7 +79,7 @@ by word.
 
 ## Verifying it yourself
 
-- The coloured page and the master text always agree, because the page is
+- The colored page and the master text always agree, because the page is
   generated from the master text.
 - The prompt log shows exactly what was asked and what came back.
 - The git history shows when each piece was added.

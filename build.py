@@ -2,7 +2,7 @@
 """Build every reader-facing output from the master text (essay.md).
 
 Produces:
-  docs/index.html   colour-coded, word-level attribution (web)
+  docs/index.html   color-coded, word-level attribution (web)
   docs/print.html   same, for printing
   docs/essay.pdf    clean APA 7 PDF for submission
 
@@ -57,18 +57,78 @@ def parse_prompts(text):
     return prompts
 
 
+_APA_REFS = {}
+
+
+def load_refs(path):
+    """Return {key: (author_field, year)} from refs.bib, for rendering citations."""
+    refs = {}
+    if not path.exists():
+        return refs
+    raw = path.read_text(encoding="utf-8")
+    lines = [ln for ln in raw.splitlines() if not ln.lstrip().startswith("%")]
+    text = "\n".join(lines)
+    for m in re.finditer(r"@\w+\s*\{\s*([^,\s]+)\s*,(.*?)\n\}", text, re.S):
+        key, body = m.group(1), m.group(2)
+
+        def field(name):
+            fm = re.search(r"\b" + name + r"\s*=\s*\{(.*?)\}", body, re.S)
+            return fm.group(1).strip() if fm else ""
+
+        refs[key] = (field("author"), field("year"))
+    return refs
+
+
+def apa_author(author_field):
+    names = [n.strip() for n in re.split(r"\band\b", author_field) if n.strip()]
+    surnames = []
+    for n in names:
+        surnames.append(n.split(",")[0].strip() if "," in n else n.split()[-1])
+    if not surnames:
+        return ""
+    if len(surnames) == 1:
+        return surnames[0]
+    if len(surnames) == 2:
+        return surnames[0] + " & " + surnames[1]
+    return surnames[0] + " et al."
+
+
+def apa_cite(key, refs, prose):
+    authors, year = refs.get(key, ("", ""))
+    name = apa_author(authors)
+    if prose:
+        return "%s (%s)" % (name, year)
+    return "%s, %s" % (name, year)
+
+
+def render_cites_html(text, refs):
+    """Replace [@key] (parenthetical) and @key (narrative) with APA text for the page."""
+
+    def parenthetical(m):
+        keys = [k for k in re.findall(r"[\w:.\-]+", m.group(1)) if k]
+        return "(" + "; ".join(apa_cite(k, refs, False) for k in keys) + ")"
+
+    text = re.sub(r"\[@([^\]]+)\]", parenthetical, text)
+    text = re.sub(r"@([A-Za-z][A-Za-z0-9_\-]*)", lambda m: apa_cite(m.group(1), refs, True), text)
+    return text
+
+
 # --------------------------------------------------------------------- HTML
 
-def emphasise(text):
+def emphasize(text):
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
     text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"<em>\1</em>", text)
     return text
 
 
+def inline_text(text):
+    return emphasize(html.escape(render_cites_html(text, _APA_REFS)))
+
+
 def plain(text):
     if text == "":
         return ""
-    return '<span class="human">' + emphasise(html.escape(text)) + "</span>"
+    return '<span class="human">' + inline_text(text) + "</span>"
 
 
 def ai_span(text, num, prompts):
@@ -78,7 +138,7 @@ def ai_span(text, num, prompts):
         tip += ': "%s"' % (snippet[:120] + ("\u2026" if len(snippet) > 120 else ""))
     return (
         '<span class="ai" data-prompt="%d" title="%s">%s</span>'
-        % (num, html.escape(tip, quote=True), emphasise(html.escape(text)))
+        % (num, html.escape(tip, quote=True), inline_text(text))
     )
 
 
@@ -421,7 +481,7 @@ def html_page(meta, mode, body, human_words, ai_words, essay_words):
     )
     note = (
         '<p class="lede"><strong>Printable version.</strong> Print this page and enable '
-        "&ldquo;background graphics&rdquo; so the colours are kept. Light green is the human "
+        "&ldquo;background graphics&rdquo; so the colors are kept. Light green is the human "
         "author; light blue with a dashed underline is the AI.</p>"
         if mode == "print"
         else ""
@@ -438,7 +498,7 @@ def html_page(meta, mode, body, human_words, ai_words, essay_words):
 <body>
 <header>
 <h1>%s &mdash; who wrote what</h1>
-<p class="lede">Every word is labelled. This page is generated from the master text
+<p class="lede">Every word is labeled. This page is generated from the master text
 (<code>essay.md</code>) and cannot disagree with it.%s</p>
 %s
 <div class="legend">
@@ -482,7 +542,7 @@ def tesc(text):
 
 
 def fmt_chunk(text):
-    pattern = re.compile(r"\*\*(.+?)\*\*|\*(.+?)\*|\[@([^\]]+)\]", re.S)
+    pattern = re.compile(r"\*\*(.+?)\*\*|\*(.+?)\*|\[@([^\]]+)\]|@([A-Za-z][A-Za-z0-9_\-]*)", re.S)
     pieces = []
     pos = 0
     for m in pattern.finditer(text):
@@ -491,8 +551,10 @@ def fmt_chunk(text):
             pieces.append(("bold", m.group(1)))
         elif m.group(2) is not None:
             pieces.append(("italic", m.group(2)))
-        else:
+        elif m.group(3) is not None:
             pieces.append(("cite", m.group(3)))
+        else:
+            pieces.append(("cite_prose", m.group(4)))
         pos = m.end()
     pieces.append(("text", text[pos:]))
     out = []
@@ -503,9 +565,11 @@ def fmt_chunk(text):
             out.append("*" + tesc(value) + "*")
         elif kind == "italic":
             out.append("_" + tesc(value) + "_")
-        else:
+        elif kind == "cite":
             keys = [k for k in re.findall(r"[\w:.\-]+", value) if k]
             out.append(" ".join("#cite(<%s>)" % k for k in keys))
+        else:
+            out.append('#cite(<%s>, form: "prose")' % value)
     return "".join(out)
 
 
@@ -719,6 +783,8 @@ def main():
     meta, body_md = split_front_matter(raw)
     md = re.sub(r"<!--.*?-->", "", body_md, flags=re.S)
     prompts = parse_prompts(PROMPTS.read_text(encoding="utf-8")) if PROMPTS.exists() else {}
+    global _APA_REFS
+    _APA_REFS = load_refs(REFS)
     main_md, appendix_md = split_appendix(md)
     main_html, _, _ = render_html(main_md, prompts)
     appendix_html, _, _ = render_html(appendix_md, prompts) if appendix_md.strip() else ("", 0, 0)
