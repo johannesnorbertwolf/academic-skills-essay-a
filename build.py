@@ -552,6 +552,10 @@ def lesc(text):
     return "".join(LATEX_SPECIAL.get(c, c) for c in text)
 
 
+def latexify_urls(text):
+    return re.sub(r"(https?://[^\s)]+)", r"\\url{\1}", text)
+
+
 def load_bib(path):
     """Return {key: {field: value}} from the simple BibTeX file."""
     entries = {}
@@ -642,7 +646,7 @@ def fmt_chunk_latex(text, refs):
             out.append(lesc("(" + "; ".join(apa_cite(k, refs, False) for k in keys) + ")"))
         else:
             out.append(lesc(apa_cite(value, refs, True)))
-    return "".join(out)
+    return latexify_urls("".join(out))
 
 
 def inline_latex(text, refs):
@@ -724,6 +728,7 @@ LATEX_TEMPLATE = r'''\documentclass[stu,12pt,@@PAPERSIZE@@]{apa7}
 \course{@@COURSE@@}
 \professor{@@INSTRUCTOR@@}
 \duedate{@@DATE@@}
+\note{@@NOTE@@}
 \begin{document}
 \maketitle
 
@@ -753,6 +758,8 @@ def latex_document(meta, body, references, appendix):
         "@@COURSE@@": lesc(meta.get("course", "")),
         "@@INSTRUCTOR@@": lesc(meta.get("instructor", "")),
         "@@DATE@@": lesc(meta.get("date", "")),
+        "@@NOTE@@": "Transparency record: every word is attributed and every prompt is logged at \\url{%s}"
+        % meta.get("repo", DEFAULT_REPO),
         "@@BODY@@": body,
         "@@REFERENCES@@": references,
         "@@APPENDIX@@": appendix,
