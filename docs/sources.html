@@ -44,8 +44,9 @@ font-size:.82rem;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.3);white-sp
 .record blockquote{border-left:3px solid #cdd7e5;background:#f7f9fc;margin:.6rem 0;
 padding:.5rem .9rem;border-radius:0 6px 6px 0;font-size:.95rem;}
 .record blockquote p{margin:.35rem 0;}
-.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:1rem 0;}
-.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;}
+.table-wrap{overflow-x:auto;margin:1rem 0;}
+.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:0;}
+.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;overflow-wrap:anywhere;}
 .record th{background:#f2f4f7;}
 .record code,code{background:#eef1f6;padding:.05rem .3rem;border-radius:3px;font-size:.9em;}
 .record hr{border:none;border-top:1px solid #e0e4ea;margin:2rem 0;}
@@ -71,7 +72,7 @@ footer a{color:var(--link);}
 <main>
 <div class="record">
 <p>The documents used to write this essay. The files themselves live in the <code>sources/</code> folder of the working copy, but that folder is <strong>not committed</strong>, for copyright reasons — these are course and publisher materials, not ours to redistribute. This file is the public record of what was used.</p>
-<table><thead><tr><th>File in <code>sources/</code></th><th>What it is</th></tr></thead><tbody><tr><td><code>Syllabus Academic Skills (2026-2027).pdf</code></td><td>The Academic Skills course syllabus: schedule, guidelines, and the assignment briefs.</td></tr><tr><td><code>miyatsu-et-al-2018-five-popular-study-strategies-their-pitfalls-and-optimal-implementations.pdf</code></td><td>Miyatsu, Nguyen &amp; McDaniel (2018).</td></tr><tr><td><code>putnam-et-al-2016-optimizing-learning-in-college.pdf</code></td><td>Putnam, Sungkhasettee &amp; Roediger (2016).</td></tr></tbody></table>
+<div class="table-wrap"><table><thead><tr><th>File in <code>sources/</code></th><th>What it is</th></tr></thead><tbody><tr><td><code>Syllabus Academic Skills (2026-2027).pdf</code></td><td>The Academic Skills course syllabus: schedule, guidelines, and the assignment briefs.</td></tr><tr><td><code>miyatsu-et-al-2018-five-popular-study-strategies-their-pitfalls-and-optimal-implementations.pdf</code></td><td>Miyatsu, Nguyen &amp; McDaniel (2018).</td></tr><tr><td><code>putnam-et-al-2016-optimizing-learning-in-college.pdf</code></td><td>Putnam, Sungkhasettee &amp; Roediger (2016).</td></tr></tbody></table></div>
 <h2 id="how-to-cite-them">How to cite them</h2>
 <p>The two papers are already entered in <code>refs.bib</code>, so citing them in <code>essay.md</code> is just <code>[@miyatsu2018]</code> or <code>[@putnam2016]</code>, and the reference list is built automatically in APA style.</p>
 <h2 id="full-references">Full references</h2>

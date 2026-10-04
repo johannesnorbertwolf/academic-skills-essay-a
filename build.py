@@ -294,7 +294,10 @@ def render_markdown(md):
             body = "".join(
                 "<tr>%s</tr>" % "".join("<td>%s</td>" % md_inline(c) for c in r) for r in rows
             )
-            out.append("<table><thead><tr>%s</tr></thead><tbody>%s</tbody></table>" % (thead, body))
+            out.append(
+                '<div class="table-wrap"><table><thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>'
+                % (thead, body)
+            )
             continue
         if s.startswith(">"):
             paras, cur = [], []
@@ -564,8 +567,9 @@ font-size:.82rem;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.3);white-sp
 .record blockquote{border-left:3px solid #cdd7e5;background:#f7f9fc;margin:.6rem 0;
 padding:.5rem .9rem;border-radius:0 6px 6px 0;font-size:.95rem;}
 .record blockquote p{margin:.35rem 0;}
-.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:1rem 0;}
-.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;}
+.table-wrap{overflow-x:auto;margin:1rem 0;}
+.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:0;}
+.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;overflow-wrap:anywhere;}
 .record th{background:#f2f4f7;}
 .record code,code{background:#eef1f6;padding:.05rem .3rem;border-radius:3px;font-size:.9em;}
 .record hr{border:none;border-top:1px solid #e0e4ea;margin:2rem 0;}

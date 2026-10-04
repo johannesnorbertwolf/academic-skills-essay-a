@@ -44,8 +44,9 @@ font-size:.82rem;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.3);white-sp
 .record blockquote{border-left:3px solid #cdd7e5;background:#f7f9fc;margin:.6rem 0;
 padding:.5rem .9rem;border-radius:0 6px 6px 0;font-size:.95rem;}
 .record blockquote p{margin:.35rem 0;}
-.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:1rem 0;}
-.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;}
+.table-wrap{overflow-x:auto;margin:1rem 0;}
+.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:0;}
+.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;overflow-wrap:anywhere;}
 .record th{background:#f2f4f7;}
 .record code,code{background:#eef1f6;padding:.05rem .3rem;border-radius:3px;font-size:.9em;}
 .record hr{border:none;border-top:1px solid #e0e4ea;margin:2rem 0;}
@@ -71,12 +72,12 @@ footer a{color:var(--link);}
 <main>
 <div class="record">
 <p>How much the AI assistance in this project actually cost, in tokens and in money. This file is generated from the local opencode session database by <code>costs.py</code>; the numbers are read from the tool, not typed by hand.</p>
-<p>Last updated: 2026-10-04 16:23</p>
+<p>Last updated: 2026-10-04 16:25</p>
 <p>Model: <code>deepseek-flash (deepseek)</code></p>
 <h2 id="totals">Totals</h2>
-<table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody><tr><td>Sessions</td><td>1</td></tr><tr><td>Input tokens</td><td>1,436,371</td></tr><tr><td>Output tokens</td><td>169,092</td></tr><tr><td>Reasoning tokens</td><td>576,635</td></tr><tr><td>Cache-read tokens</td><td>66,534,656</td></tr><tr><td>Cache-write tokens</td><td>0</td></tr><tr><td><strong>Total tokens (all kinds)</strong></td><td><strong>68,716,754</strong></td></tr><tr><td><strong>API spend (USD)</strong></td><td><strong>$0.7710</strong></td></tr></tbody></table>
+<div class="table-wrap"><table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody><tr><td>Sessions</td><td>1</td></tr><tr><td>Input tokens</td><td>1,437,160</td></tr><tr><td>Output tokens</td><td>170,057</td></tr><tr><td>Reasoning tokens</td><td>578,156</td></tr><tr><td>Cache-read tokens</td><td>66,902,400</td></tr><tr><td>Cache-write tokens</td><td>0</td></tr><tr><td><strong>Total tokens (all kinds)</strong></td><td><strong>69,087,773</strong></td></tr><tr><td><strong>API spend (USD)</strong></td><td><strong>$0.7737</strong></td></tr></tbody></table></div>
 <h2 id="per-session">Per session</h2>
-<table><thead><tr><th>Session</th><th>Started</th><th>Input</th><th>Output</th><th>Reasoning</th><th>Cache read</th><th>Cache write</th><th>Cost (USD)</th></tr></thead><tbody><tr><td>ses_f17f91a40ffenBLUPW4wByHmy9</td><td>2026-09-28 14:39</td><td>1,436,371</td><td>169,092</td><td>576,635</td><td>66,534,656</td><td>0</td><td>$0.7710</td></tr></tbody></table>
+<div class="table-wrap"><table><thead><tr><th>Session</th><th>Started</th><th>Input</th><th>Output</th><th>Reasoning</th><th>Cache read</th><th>Cache write</th><th>Cost (USD)</th></tr></thead><tbody><tr><td>ses_f17f91a40ffenBLUPW4wByHmy9</td><td>2026-09-28 14:39</td><td>1,437,160</td><td>170,057</td><td>578,156</td><td>66,902,400</td><td>0</td><td>$0.7737</td></tr></tbody></table></div>
 <p>Notes: cache-read tokens are reused context and are charged at a much lower rate than fresh input, so the token total is larger than the spend might suggest. The dollar figure is what opencode recorded as the cost of these sessions.</p>
 </div>
 </main>

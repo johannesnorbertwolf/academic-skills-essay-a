@@ -44,8 +44,9 @@ font-size:.82rem;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.3);white-sp
 .record blockquote{border-left:3px solid #cdd7e5;background:#f7f9fc;margin:.6rem 0;
 padding:.5rem .9rem;border-radius:0 6px 6px 0;font-size:.95rem;}
 .record blockquote p{margin:.35rem 0;}
-.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:1rem 0;}
-.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;}
+.table-wrap{overflow-x:auto;margin:1rem 0;}
+.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:0;}
+.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;overflow-wrap:anywhere;}
 .record th{background:#f2f4f7;}
 .record code,code{background:#eef1f6;padding:.05rem .3rem;border-radius:3px;font-size:.9em;}
 .record hr{border:none;border-top:1px solid #e0e4ea;margin:2rem 0;}
@@ -88,7 +89,7 @@ footer a{color:var(--link);}
 <ul><li><strong>Costs</strong> — the token usage and API spend, read from the tool&#x27;s own records.</li><li><strong>Word count</strong> — the running essay-body count and the human/AI split.</li><li><strong>Sources</strong> — what was used and how to cite it.</li><li><strong>How it was made</strong> — this document.</li></ul>
 <p>The repository stays the technical source of truth; the website is generated from it, so the two cannot disagree.</p>
 <h2 id="the-legend">The legend</h2>
-<table><thead><tr><th>Color</th><th>Meaning</th></tr></thead><tbody><tr><td>Plain / light green</td><td>Written by <strong>Johannes Wolf</strong></td></tr><tr><td>Light blue with a dashed underline</td><td>Written by the <strong>AI</strong></td></tr></tbody></table>
+<div class="table-wrap"><table><thead><tr><th>Color</th><th>Meaning</th></tr></thead><tbody><tr><td>Plain / light green</td><td>Written by <strong>Johannes Wolf</strong></td></tr><tr><td>Light blue with a dashed underline</td><td>Written by the <strong>AI</strong></td></tr></tbody></table></div>
 <p>The AI passages also carry a dashed underline on purpose, so the distinction survives black-and-white printing and color blindness.</p>
 <p>A summary at the top of the rendered page states exactly how many words each side wrote, and what share of the essay that is.</p>
 <h2 id="where-the-truth-lives">Where the truth lives</h2>
