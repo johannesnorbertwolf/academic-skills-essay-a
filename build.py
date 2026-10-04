@@ -544,6 +544,9 @@ header h1{font-size:1.3rem;margin:0 0 .3rem;font-family:system-ui,sans-serif;}
 .swatch.ai{background:var(--ai-bg);border:1px solid var(--ai-line);border-bottom:2px dashed var(--ai-line);}
 .summary{font-family:system-ui,sans-serif;font-size:.9rem;color:#333;background:#f2f4f7;
 border:1px solid #e0e4ea;border-radius:6px;padding:.6rem .8rem;display:inline-block;margin-top:.4rem;}
+.explore{font-family:system-ui,sans-serif;font-size:.92rem;color:#1b3a5b;background:#eef5ff;
+border:1px solid #cfe1fb;border-radius:8px;padding:.7rem .9rem;margin:.2rem 0 .7rem;max-width:60rem;}
+.explore a{color:var(--link);font-weight:600;}
 main{max-width:46rem;margin:2rem auto;background:#fff;padding:2rem 2.2rem 3rem;border:1px solid #e6e6e6;border-radius:8px;}
 main h1,main h2,main h3{font-family:system-ui,sans-serif;line-height:1.25;}
 main h1{font-size:1.7rem;margin-top:0;}
@@ -675,16 +678,26 @@ def essay_page(meta, mode, body, human_words, ai_words, essay_words):
             "passage to preview the prompt that produced it, and <strong>click</strong> it to "
             "read the full exchange in the prompt log."
         )
+    if mode == "print":
+        explore = ""
+    else:
+        explore = (
+            '<p class="explore">Have a look around &mdash; the links at the top are meant to be an '
+            "enjoyable way to see exactly how this assignment was written. You can read every prompt "
+            "and every reply, check the sources, and see for yourself "
+            '<a href="costs.html">how many tokens the AI used and how much money it cost</a>.</p>'
+        )
     header = (
         "<h1>%s &mdash; who wrote what</h1>"
         '<p class="lede">%s</p>'
+        "%s"
         '<div class="legend">'
         '<span class="item"><span class="swatch human"></span> Written by Johannes Wolf</span>'
         '<span class="item"><span class="swatch ai"></span> Written by the AI</span>'
         "</div>"
         '<p class="summary">%s</p>'
         '<p class="summary">%s</p>'
-        % (html.escape(title), lede, summary, essay_line)
+        % (html.escape(title), lede, explore, summary, essay_line)
     )
     return page_shell(meta, "index", title, header, body)
 
