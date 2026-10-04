@@ -32,6 +32,10 @@ was made, so the rules matter as much as the essay.
   (colored web page, printable page, APA PDF).
 - Cite sources as `[@key]` (parenthetical) or `@key` (narrative), with entries in
   `refs.bib`.
+- The APA PDF is produced with Tectonic (a LaTeX engine) using the `apa7` class,
+  which owns the page layout: title page, double spacing, centered headings,
+  hanging indents and page numbers. `build.py` only feeds it the text and the
+  two formatted references.
 
 ## Editing the text by hand
 

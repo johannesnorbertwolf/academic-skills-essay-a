@@ -532,16 +532,88 @@ def html_page(meta, mode, body, human_words, ai_words, essay_words):
     )
 
 
-# -------------------------------------------------------------------- Typst
+# -------------------------------------------------------------- PDF (LaTeX)
 
-TYPST_SPECIAL = set("\\#$~*_`<>@[]")
+LATEX_SPECIAL = {
+    "\\": r"\textbackslash{}",
+    "&": r"\&",
+    "%": r"\%",
+    "$": r"\$",
+    "#": r"\#",
+    "_": r"\_",
+    "{": r"\{",
+    "}": r"\}",
+    "~": r"\textasciitilde{}",
+    "^": r"\textasciicircum{}",
+}
 
 
-def tesc(text):
-    return "".join(("\\" + c) if c in TYPST_SPECIAL else c for c in text)
+def lesc(text):
+    return "".join(LATEX_SPECIAL.get(c, c) for c in text)
 
 
-def fmt_chunk(text):
+def load_bib(path):
+    """Return {key: {field: value}} from the simple BibTeX file."""
+    entries = {}
+    if not path.exists():
+        return entries
+    raw = path.read_text(encoding="utf-8")
+    lines = [ln for ln in raw.splitlines() if not ln.lstrip().startswith("%")]
+    text = "\n".join(lines)
+    for m in re.finditer(r"@\w+\s*\{\s*([^,\s]+)\s*,(.*?)\n\}", text, re.S):
+        fields = {}
+        for fm in re.finditer(r"(\w+)\s*=\s*\{(.*?)\}", m.group(2), re.S):
+            fields[fm.group(1).lower()] = fm.group(2).strip()
+        entries[m.group(1)] = fields
+    return entries
+
+
+def apa_name(name):
+    parts = [p.strip() for p in name.split(",")]
+    family = parts[0]
+    given = parts[1] if len(parts) > 1 else ""
+    suffix = parts[2] if len(parts) > 2 else ""
+    initials = " ".join(tok[0].upper() + "." for tok in re.split(r"[\s.]+", given) if tok)
+    out = family
+    if initials:
+        out += ", " + initials
+    if suffix:
+        out += ", " + suffix + "."
+    return out
+
+
+def apa_authors(author_field):
+    names = [apa_name(n.strip()) for n in re.split(r"\band\b", author_field) if n.strip()]
+    if not names:
+        return ""
+    if len(names) == 1:
+        return names[0]
+    if len(names) == 2:
+        return names[0] + ", \\& " + names[1]
+    return ", ".join(names[:-1]) + ", \\& " + names[-1]
+
+
+def apa_reference(entry):
+    ref = "%s (%s). %s. " % (
+        apa_authors(entry.get("author", "")),
+        entry.get("year", ""),
+        entry.get("title", "").rstrip("."),
+    )
+    journal = entry.get("journal", "")
+    volume = entry.get("volume", "")
+    if journal:
+        ref += "\\textit{%s, %s}" % (journal, volume) if volume else "\\textit{%s}" % journal
+        if entry.get("number"):
+            ref += "(%s)" % entry["number"]
+        if entry.get("pages"):
+            ref += ", %s" % entry["pages"]
+        ref += "."
+    if entry.get("doi"):
+        ref += " https://doi.org/%s" % entry["doi"]
+    return ref
+
+
+def fmt_chunk_latex(text, refs):
     pattern = re.compile(r"\*\*(.+?)\*\*|\*(.+?)\*|\[@([^\]]+)\]|@([A-Za-z][A-Za-z0-9_\-]*)", re.S)
     pieces = []
     pos = 0
@@ -560,26 +632,26 @@ def fmt_chunk(text):
     out = []
     for kind, value in pieces:
         if kind == "text":
-            out.append(tesc(value))
+            out.append(lesc(value))
         elif kind == "bold":
-            out.append("*" + tesc(value) + "*")
+            out.append("\\textbf{%s}" % lesc(value))
         elif kind == "italic":
-            out.append("_" + tesc(value) + "_")
+            out.append("\\textit{%s}" % lesc(value))
         elif kind == "cite":
             keys = [k for k in re.findall(r"[\w:.\-]+", value) if k]
-            out.append(" ".join("#cite(<%s>)" % k for k in keys))
+            out.append(lesc("(" + "; ".join(apa_cite(k, refs, False) for k in keys) + ")"))
         else:
-            out.append('#cite(<%s>, form: "prose")' % value)
+            out.append(lesc(apa_cite(value, refs, True)))
     return "".join(out)
 
 
-def inline_typst(text):
+def inline_latex(text, refs):
     text = AI_OPEN.sub(" ", text).replace(AI_CLOSE, " ")
     text = re.sub(r"[ \t]+", " ", text)
-    return fmt_chunk(text)
+    return fmt_chunk_latex(text, refs)
 
 
-def render_typst_body(md):
+def render_latex_body(md, refs, page_break_h1=False):
     lines = md.split("\n")
     out = []
     i = 0
@@ -590,12 +662,15 @@ def render_typst_body(md):
             i += 1
             continue
         if re.match(r"^---+$", s):
-            out.append("#line(length: 100%)")
+            out.append("\\noindent\\rule{\\linewidth}{0.4pt}")
             i += 1
             continue
         m = re.match(r"^(#{1,6})\s+(.*)$", s)
         if m:
-            out.append("=" * len(m.group(1)) + " " + inline_typst(m.group(2)))
+            level = len(m.group(1))
+            cmd = {1: "section", 2: "subsection"}.get(level, "subsubsection")
+            prefix = "\\newpage\n" if (page_break_h1 and level == 1) else ""
+            out.append("%s\\%s{%s}" % (prefix, cmd, inline_latex(m.group(2), refs)))
             i += 1
             continue
         if s.startswith(">"):
@@ -603,23 +678,23 @@ def render_typst_body(md):
             while i < n and lines[i].strip().startswith(">"):
                 block.append(lines[i].strip()[1:].strip())
                 i += 1
-            out.append("#block(inset: (left: 0.5in))[%s]" % inline_typst(" ".join(block)))
+            out.append("\\begin{quote}%s\\end{quote}" % inline_latex(" ".join(block), refs))
             continue
         if re.match(r"^[-*]\s+", s):
-            items = []
+            out.append("\\begin{itemize}")
             while i < n and re.match(r"^[-*]\s+", lines[i].strip()):
                 item = re.sub(r"^[-*]\s+", "", lines[i].strip())
-                items.append("- " + inline_typst(item))
+                out.append("\\item %s" % inline_latex(item, refs))
                 i += 1
-            out.append("\n".join(items))
+            out.append("\\end{itemize}")
             continue
         if re.match(r"^\d+\.\s+", s):
-            items = []
+            out.append("\\begin{enumerate}")
             while i < n and re.match(r"^\d+\.\s+", lines[i].strip()):
                 item = re.sub(r"^\d+\.\s+", "", lines[i].strip())
-                items.append("+ " + inline_typst(item))
+                out.append("\\item %s" % inline_latex(item, refs))
                 i += 1
-            out.append("\n".join(items))
+            out.append("\\end{enumerate}")
             continue
         para = []
         while i < n:
@@ -635,112 +710,95 @@ def render_typst_body(md):
                 break
             para.append(t)
             i += 1
-        text = inline_typst(" ".join(para))
-        if text[:1] in ("-", "+", "/", "="):
-            text = "\\" + text
-        out.append(text)
+        out.append(inline_latex(" ".join(para), refs))
     return "\n\n".join(out)
 
 
-TYPST_TEMPLATE = r'''#set page(
-  paper: "@@PAPERSIZE@@",
-  margin: 1in,
-  numbering: none,
-  header: context {
-    set text(font: "@@FONT@@", size: 12pt)
-    align(right, counter(page).display("1"))
-  },
-)
-#set text(font: "@@FONT@@", size: 12pt, lang: "en")
-#set par(leading: 1em, first-line-indent: (amount: 0.5in, all: true), justify: false)
-
-#show heading.where(level: 1): it => block(above: 1.2em, below: 0.6em, align(center, text(weight: "bold", it.body)))
-#show heading.where(level: 2): it => block(above: 1.2em, below: 0.6em, text(weight: "bold", it.body))
-#show heading.where(level: 3): it => block(above: 1.2em, below: 0.6em, text(weight: "bold", style: "italic", it.body))
-
-#show bibliography: set par(first-line-indent: (amount: 0.5in, all: true), hanging-indent: 0.5in)
-
-// ------------------------------------------------- title page
-#v(2.5in)
-#align(center)[#text(weight: "bold")[@@TITLE@@]]
-#v(1.5em)
-#align(center)[
-  @@STACK@@
-]
-#v(1fr)
-#align(center)[#text(size: 10pt)[Transparency record: every word is attributed and every prompt is logged at @@REPO@@]]
-
-#pagebreak()
-
-// ------------------------------------------------- body
-#align(center)[#text(weight: "bold")[@@TITLE@@]]
+LATEX_TEMPLATE = r'''\documentclass[stu,12pt,@@PAPERSIZE@@]{apa7}
+\usepackage{fontspec}
+\setmainfont{@@FONT@@}
+\usepackage[american]{babel}
+\title{@@TITLE@@}
+\author{@@AUTHOR@@}
+\affiliation{@@AFFILIATION@@}
+\course{@@COURSE@@}
+\professor{@@INSTRUCTOR@@}
+\duedate{@@DATE@@}
+\begin{document}
+\maketitle
 
 @@BODY@@
 
 @@REFERENCES@@
 
 @@APPENDIX@@
+\end{document}
 '''
 
-PAPER_SIZES = {"a4": "a4", "letter": "us-letter", "us-letter": "us-letter", "usletter": "us-letter"}
+LATEX_PAPER_SIZES = {
+    "a4": "a4paper",
+    "letter": "letterpaper",
+    "us-letter": "letterpaper",
+    "usletter": "letterpaper",
+}
 
 
-def typst_document(meta, body, appendix, has_cites):
-    stack_lines = [
-        meta.get("author", ""),
-        meta.get("affiliation", ""),
-        meta.get("course", ""),
-        meta.get("instructor", ""),
-        meta.get("date", ""),
-    ]
-    stack = " \\\n  ".join(tesc(x) for x in stack_lines if x)
-    references = ""
-    if has_cites:
-        references = (
-            "#pagebreak()\n"
-            "#align(center)[#text(weight: \"bold\")[References]]\n\n"
-            '#bibliography("../refs.bib", style: "apa")'
-        )
-    doc = TYPST_TEMPLATE
+def latex_document(meta, body, references, appendix):
     replacements = {
-        "@@PAPERSIZE@@": PAPER_SIZES.get(meta.get("papersize", "a4").lower(), "a4"),
+        "@@PAPERSIZE@@": LATEX_PAPER_SIZES.get(meta.get("papersize", "a4").lower(), "a4paper"),
         "@@FONT@@": meta.get("font", "Times New Roman"),
-        "@@TITLE@@": tesc(meta.get("title", "Essay")),
-        "@@STACK@@": stack,
-        "@@REPO@@": tesc(meta.get("repo", DEFAULT_REPO)),
+        "@@TITLE@@": lesc(meta.get("title", "Essay")),
+        "@@AUTHOR@@": lesc(meta.get("author", "")),
+        "@@AFFILIATION@@": lesc(meta.get("affiliation", "")).replace(",", "{,}"),
+        "@@COURSE@@": lesc(meta.get("course", "")),
+        "@@INSTRUCTOR@@": lesc(meta.get("instructor", "")),
+        "@@DATE@@": lesc(meta.get("date", "")),
         "@@BODY@@": body,
         "@@REFERENCES@@": references,
         "@@APPENDIX@@": appendix,
     }
+    doc = LATEX_TEMPLATE
     for key, value in replacements.items():
         doc = doc.replace(key, value)
     return doc
 
 
 def build_pdf(meta, md):
-    if shutil.which("typst") is None:
-        print("Typst not found; skipping the APA PDF.")
+    if shutil.which("tectonic") is None:
+        print("Tectonic not found; skipping the APA PDF.")
         return
     main_md, appendix_md = split_appendix(md)
-    body = render_typst_body(main_md)
-    appendix = render_typst_body(appendix_md) if appendix_md.strip() else ""
-    has_cites = "#cite(" in body and REFS.exists() and bool(REFS.read_text(encoding="utf-8").strip())
+    bib = load_bib(REFS)
+    body = render_latex_body(main_md, _APA_REFS)
+    appendix = (
+        render_latex_body(appendix_md, _APA_REFS, page_break_h1=True)
+        if appendix_md.strip()
+        else ""
+    )
+    has_cites = bool(bib) and bool(re.search(r"\[@|(?<![@\w])@[A-Za-z]", main_md))
+    references = ""
+    if has_cites:
+        entries = sorted(bib.values(), key=lambda e: e.get("author", ""))
+        references = (
+            "\\newpage\n\\section*{References}\n\n"
+            "\\begingroup\n\\parindent=0pt \\hangindent=0.5in \\hangafter=1\n"
+            + "\n\n".join("\\noindent " + apa_reference(e) for e in entries)
+            + "\n\\endgroup"
+        )
     BUILD.mkdir(exist_ok=True)
     DOCS.mkdir(exist_ok=True)
-    typ_path = BUILD / "paper.typ"
-    typ_path.write_text(typst_document(meta, body, appendix, has_cites), encoding="utf-8")
+    tex_path = BUILD / "essay.tex"
+    tex_path.write_text(latex_document(meta, body, references, appendix), encoding="utf-8")
     out = DOCS / "essay.pdf"
     result = subprocess.run(
-        ["typst", "compile", "--root", str(ROOT), str(typ_path), str(out)],
+        ["tectonic", "-X", "compile", str(tex_path), "--outdir", str(DOCS)],
         capture_output=True,
         text=True,
     )
     if result.returncode != 0:
-        print("Typst could not build the PDF:")
+        print("Tectonic could not build the PDF:")
         print(result.stderr.strip())
     else:
-        if result.stderr.strip():
-            print(result.stderr.strip())
         print("Built docs/essay.pdf")
 
 
