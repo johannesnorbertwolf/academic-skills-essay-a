@@ -43,7 +43,7 @@ is left out of the count. `build.py` writes the running total to WORDCOUNT.md.
 
 # [[AI:22]]Introduction[[/AI]]
 
-A university student spends many hours studying. Yet, many students are surprised and disappointed by their results. [[AI:20]]A common reason is that they rely on strategies that feel effective but are not: rereading a textbook chapter, for example, creates a sense of familiarity that is easily mistaken for real knowledge. Cognitive research has identified study techniques that produce more durable learning, yet students tend to underuse them. Self-report studies show that students favor rereading and highlighting over the methods that research supports [@miyatsu2018].[[/AI]] [[AI:53]]The most popular study techniques are therefore not the most effective ones.[[/AI]] [[AI:20]]Some reviews have responded by suggesting how students might improve the strategies they already prefer [@miyatsu2018]; a more [[/AI]]direct route, [[AI:20]]however, is to adopt the strategies with the strongest evidence. This essay therefore asks how university students can optimize their learning, and answers by discussing three evidence-based strategies: pretesting, retrieval practice, and spaced practice. Effective studying is not simply a matter of effort, but [[/AI]]of method.
+A university student spends many hours studying. Yet, many students are surprised and disappointed by their results. [[AI:20]]A common reason is that they rely on strategies that feel effective but are not: rereading a textbook chapter, for example, creates a sense of familiarity that is easily mistaken for real knowledge. Cognitive research has identified study techniques that produce more durable learning, yet students tend to underuse them. Self-report studies show that students favor rereading and highlighting over the methods that research supports [@miyatsu2018].[[/AI]] [[AI:53]]The most popular study techniques are therefore not the most effective ones.[[/AI]] [[AI:20]]Some reviews have responded by suggesting how students might improve the strategies they already prefer [@miyatsu2018]. A more [[/AI]]direct route, [[AI:20]]however, is to adopt the strategies with the strongest evidence. This essay therefore asks how university students can optimize their learning, and answers by discussing three evidence-based strategies: pretesting, retrieval practice, and spaced practice. Effective studying is not simply a matter of effort, but [[/AI]]of method.
 
 ## [[AI:22]]Pretesting[[/AI]]
 
@@ -62,11 +62,9 @@ As discussed by @miyatsu2018, at least summarization and outlining can be altere
 
 ## [[AI:22]]Spaced Practice[[/AI]]
 
-The third strategy is spaced practice: this has nothing to do with how to study but with when to study. If a student uses spaced practice, they study for short periods of time, mix studying of different subjects and take considerable breaks between study sessions. [[AI:33]]In practice, this means studying each subject a little on most days and revisiting earlier topics in later sessions.[[/AI]] The opposite of spaced practice is massed, crammed studying. According to @putnam2016, for the same time spent studying, spaced practice gives much better results.
+The third strategy is spaced practice: this is not about how to study but when. If a student uses spaced practice, they study for short periods of time, mix studying of different subjects and take considerable breaks between study sessions. [[AI:33]]In practice, this means studying each subject a little on most days and revisiting earlier topics in later sessions.[[/AI]] The opposite of spaced practice is massed, crammed studying. According to @putnam2016, for the same time spent studying, spaced practice gives much better results.
 
-The typical example of cramming is a long study session the day or even the night before an exam. The difference in retention becomes even greater in the long term. While this might give acceptable results on the day of the exam, for long-term learning, spaced practice is the much better study strategy.
-
-Assuming university students are not merely studying to pass exams but are eager to learn and remember, spaced practice is the more effective strategy. 
+The typical example of cramming is a long study session the day or even the night before an exam. The difference in retention becomes even greater in the long term. While this might give acceptable results on the day of the exam, for long-term learning, spaced practice is the much better study strategy. Assuming university students are not merely studying to pass exams but are eager to learn and remember, spaced practice is the more effective strategy. 
 
   
 
@@ -79,7 +77,7 @@ Unlike the study strategies reviewed by @miyatsu2018, the study strategies discu
 
 The technological advancements in AI can benefit these study methods. For example, a student may feed their study material to a chatbot and have it create a pretesting quiz for them. In the RRR method, they might ask an AI chatbot for feedback after the final review step of the method to make sure they did not miss or misunderstand anything.
 
-The strategies discussed in this paper do not mean that a student has to spend more time studying. With these more efficient strategies they should get better results with the same amount of time studying. Alternatively, if a student is already happy with their results, these study strategies should enable them to spend less time studying for a similar result. [[AI:42]]Any time saved can be spent as they wish.[[/AI]]
+The strategies discussed in this paper do not mean that a student has to spend more time studying. With these more efficient strategies they should get better results with the same amount of time studying. Alternatively, if a student is already happy with their results, these study strategies should enable them to spend less time studying for a similar result. Any time saved can be leisurely spent with what student life has to offer beyond lectures, studying and exams.
 
 # [[AI:20]]AI disclosure statement[[/AI]]
 
