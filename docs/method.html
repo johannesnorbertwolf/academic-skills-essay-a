@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academic Skills Essay A — who wrote what</title>
+<style>
+:root{--human-bg:#e6f6e6;--human-bg-hover:#d3efd3;--ai-bg:#e3f0ff;--ai-bg-hover:#cfe4ff;
+--ai-line:#2f6fd0;--ink:#1a1a1a;--link:#2f6fd0;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:Georgia,'Times New Roman',serif;color:var(--ink);line-height:1.6;background:#fafafa;}
+nav.top{background:#fff;border-bottom:1px solid #ddd;padding:.5rem 1.5rem;font-family:system-ui,sans-serif;font-size:.85rem;}
+nav.top ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;}
+nav.top a{color:var(--link);text-decoration:none;}
+nav.top a:hover{text-decoration:underline;}
+nav.top a[aria-current=page]{color:#111;font-weight:600;}
+header{background:#fff;border-bottom:1px solid #ddd;padding:1.5rem 1.5rem 1rem;}
+header h1{font-size:1.3rem;margin:0 0 .3rem;font-family:system-ui,sans-serif;}
+.lede{margin:0 0 .8rem;color:#444;max-width:60rem;font-family:system-ui,sans-serif;font-size:.92rem;}
+.legend{display:flex;flex-wrap:wrap;gap:1.2rem;margin:.6rem 0;font-family:system-ui,sans-serif;font-size:.9rem;}
+.legend .item{display:inline-flex;align-items:center;gap:.45rem;}
+.swatch{width:1.1rem;height:1.1rem;display:inline-block;border-radius:3px;}
+.swatch.human{background:var(--human-bg);border:1px solid #bcd9bc;}
+.swatch.ai{background:var(--ai-bg);border:1px solid var(--ai-line);border-bottom:2px dashed var(--ai-line);}
+.summary{font-family:system-ui,sans-serif;font-size:.9rem;color:#333;background:#f2f4f7;
+border:1px solid #e0e4ea;border-radius:6px;padding:.6rem .8rem;display:inline-block;margin-top:.4rem;}
+main{max-width:46rem;margin:2rem auto;background:#fff;padding:2rem 2.2rem 3rem;border:1px solid #e6e6e6;border-radius:8px;}
+main h1,main h2,main h3{font-family:system-ui,sans-serif;line-height:1.25;}
+main h1{font-size:1.7rem;margin-top:0;}
+main h2{font-size:1.25rem;margin-top:2rem;border-bottom:1px solid #eee;padding-bottom:.2rem;}
+main p{margin:0 0 1rem;}
+.human{background:var(--human-bg);border-radius:2px;}
+.ai{background:var(--ai-bg);border-radius:2px;border-bottom:2px dashed var(--ai-line);cursor:pointer;
+color:inherit;text-decoration:none;position:relative;}
+.ai:hover,.ai:focus{background:var(--ai-bg-hover);}
+.ai .tip{display:none;position:absolute;left:0;top:1.7em;z-index:60;width:min(32rem,86vw);
+background:#141821;color:#f5f5f5;padding:.7rem .85rem;border-radius:8px;font-family:system-ui,sans-serif;
+font-size:.82rem;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.3);white-space:normal;text-align:left;}
+.ai .tip .tip-h{display:block;font-weight:600;color:#9dc2f0;margin-bottom:.35rem;}
+.ai:hover .tip,.ai:focus .tip{display:block;}
+.record blockquote{border-left:3px solid #cdd7e5;background:#f7f9fc;margin:.6rem 0;
+padding:.5rem .9rem;border-radius:0 6px 6px 0;font-size:.95rem;}
+.record blockquote p{margin:.35rem 0;}
+.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:1rem 0;}
+.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;}
+.record th{background:#f2f4f7;}
+.record code,code{background:#eef1f6;padding:.05rem .3rem;border-radius:3px;font-size:.9em;}
+.record hr{border:none;border-top:1px solid #e0e4ea;margin:2rem 0;}
+.record ul,.record ol{margin:0 0 1rem;padding-left:1.4rem;}
+.record li{margin:.2rem 0;}
+footer{max-width:46rem;margin:0 auto 3rem;padding:0 2.2rem;font-family:system-ui,sans-serif;
+font-size:.8rem;color:#666;}
+footer a{color:var(--link);}
+@media print{
+ body{background:#fff;}
+ nav.top{display:none;}
+ header{border-bottom:1px solid #000;}
+ main{border:none;margin:0;padding:0;max-width:none;}
+ footer{max-width:none;padding:0;}
+ .human,.ai{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+ .ai .tip{display:none !important;}
+}
+</style>
+</head>
+<body>
+<nav class="top"><ul><li><a href="index.html">The essay</a></li><li><a href="prompts.html">Prompt log</a></li><li><a href="costs.html">Costs</a></li><li><a href="wordcount.html">Word count</a></li><li><a href="sources.html">Sources</a></li><li><a href="method.html" aria-current="page">How it was made</a></li><li><a href="essay.pdf">The PDF</a></li><li><a href="https://github.com/johannesnorbertwolf/academic-skills-essay-a">Source code (GitHub)</a></li></ul></nav>
+<header><h1>Academic Skills Essay A — who wrote what</h1><p class="lede">The full explanation of how this was made: what the record contains and how anyone can verify it.</p></header>
+<main>
+<div class="record">
+<h2 id="read-the-color-coded-essay-here-who-wrote-what-httpsjohannesnorbertwolfgithubioacademic-skills-essay-a"><strong><a href="https://johannesnorbertwolf.github.io/academic-skills-essay-a/">Read the color-coded essay here: who wrote what →</a></strong></h2>
+<p>This repository contains an essay, and a complete, word-level record of which parts were written by the human author (Johannes Wolf) and which parts were written by an AI.</p>
+<p>The point is simple: the author is <strong>not</strong> hiding that AI was used. Instead, every single word is labeled, every prompt is published, and the whole process is visible to anyone.</p>
+<h2 id="how-to-read-the-essay">How to read the essay</h2>
+<p>Three versions are produced automatically from the same master text:</p>
+<ul><li><strong>Colored web page:</strong> open the published website,</li></ul>
+<p><a href="https://johannesnorbertwolf.github.io/academic-skills-essay-a/">https://johannesnorbertwolf.github.io/academic-skills-essay-a/</a> (or <code>docs/index.html</code>). Hover over any blue passage to preview the prompt that produced it; click it to jump to the full exchange in the prompt log.</p>
+<ul><li><strong>Printable version:</strong> open <code>docs/print.html</code> and print it (enable</li></ul>
+<p>&quot;background graphics&quot; so the colors show). It works on paper too.</p>
+<ul><li><strong>The submission file:</strong> <code>docs/essay.pdf</code> is the clean, APA 7 formatted essay</li></ul>
+<p>that is handed in. It carries no coloring — the transparency lives in this repository, and the PDF points readers to it.</p>
+<h2 id="explore-the-record-on-the-website">Explore the record on the website</h2>
+<p>The published website is the friendly front door to everything. Besides the color-coded essay, it has a page for each part of the record:</p>
+<ul><li><strong>Prompt log</strong> — every prompt sent to the AI and every reply it gave, plus the</li></ul>
+<p>planning questions and Johannes&#x27;s answers. Clicking any blue passage in the essay jumps straight to the prompt that produced it.</p>
+<ul><li><strong>Costs</strong> — the token usage and API spend, read from the tool&#x27;s own records.</li><li><strong>Word count</strong> — the running essay-body count and the human/AI split.</li><li><strong>Sources</strong> — what was used and how to cite it.</li><li><strong>How it was made</strong> — this document.</li></ul>
+<p>The repository stays the technical source of truth; the website is generated from it, so the two cannot disagree.</p>
+<h2 id="the-legend">The legend</h2>
+<table><thead><tr><th>Color</th><th>Meaning</th></tr></thead><tbody><tr><td>Plain / light green</td><td>Written by <strong>Johannes Wolf</strong></td></tr><tr><td>Light blue with a dashed underline</td><td>Written by the <strong>AI</strong></td></tr></tbody></table>
+<p>The AI passages also carry a dashed underline on purpose, so the distinction survives black-and-white printing and color blindness.</p>
+<p>A summary at the top of the rendered page states exactly how many words each side wrote, and what share of the essay that is.</p>
+<h2 id="where-the-truth-lives">Where the truth lives</h2>
+<p>Everything is generated from three things:</p>
+<ol><li><strong><code>essay.md</code></strong> — the master text. Words written by Johannes appear as normal</li></ol>
+<p>text. Words written by the AI are wrapped in a small tag that names the prompt that produced them. Anything untagged is counted as Johannes&#x27;s.</p>
+<ol><li><strong><code>PROMPTS.md</code></strong> — the single, generated log of the conversation: every prompt</li></ol>
+<p>sent to the AI with its answer, and every planning question with Johannes&#x27;s answer, in order. The numbers match the AI tags in <code>essay.md</code>.</p>
+<ol><li><strong>The git history</strong> — each change is a dated commit, so the process can be</li></ol>
+<p>checked step by step.</p>
+<ol><li><strong><code>COSTS.md</code></strong> — the token usage and API spend for the AI used in this</li></ol>
+<p>project, read automatically from the tool&#x27;s own records.</p>
+<ol><li><strong><code>WORDCOUNT.md</code></strong> — the running word count of the essay body, kept against</li></ol>
+<p>the required 700–1000 words. Headings and the appendix (reflection, statement on AI use) do not count.</p>
+<p><code>build.py</code> turns the master text into the colored web page, the printable version, the APA PDF, and <code>WORDCOUNT.md</code>. <code>costs.py</code> regenerates <code>COSTS.md</code>, and <code>prompts.py</code> regenerates <code>PROMPTS.md</code>. Nobody edits any of those by hand, so they cannot quietly disagree with the master text.</p>
+<h2 id="sources">Sources</h2>
+<p>The course syllabus and the two papers the essay draws on are listed in <code>SOURCES.md</code>, with full references. The files themselves are kept in the <code>sources/</code> folder of the working copy but are deliberately <strong>not committed</strong>, because they are copyrighted course and publisher materials. The two papers are also entered in <code>refs.bib</code>, so they can be cited in the essay and appear in the reference list automatically.</p>
+<h2 id="authorship-statement">Authorship statement</h2>
+<p>I, Johannes Wolf, am the author of this essay. I designed its structure, chose what to argue, wrote the untagged text, directed the AI, and take full responsibility for the final result — including every word the AI contributed, which I reviewed and approved. The AI is a tool I used openly, not a hidden co-author. This repository exists so that any reader can verify that claim word by word.</p>
+<h2 id="verifying-it-yourself">Verifying it yourself</h2>
+<ul><li>The colored page and the master text always agree, because the page is</li></ul>
+<p>generated from the master text.</p>
+<ul><li>The prompt log shows exactly what was asked and what came back.</li><li>The git history shows when each piece was added.</li><li>The APA PDF and its reference list are generated from <code>essay.md</code> and</li></ul>
+<p><code>refs.bib</code>, so the citations and the references always match.</p>
+<ul><li><code>COSTS.md</code> is read from the tool&#x27;s own usage records, not estimated.</li><li>Each commit corresponds to a single instruction, so the history reads as a</li></ul>
+<p>step-by-step log of how the essay was made.</p>
+<h2 id="rebuilding-everything">Rebuilding everything</h2>
+<p><code>build.py</code> regenerates the web page, the printable page and the APA PDF; <code>costs.py</code> regenerates <code>COSTS.md</code>. Both are run from the project folder. No output file is ever edited by hand.</p>
+</div>
+</main>
+<footer>
+<p>This page is generated from the master text on 2026-10-04. Source code, the full history
+and every raw file: <a href="https://github.com/johannesnorbertwolf/academic-skills-essay-a">https://github.com/johannesnorbertwolf/academic-skills-essay-a</a></p>
+</footer>
+</body>
+</html>

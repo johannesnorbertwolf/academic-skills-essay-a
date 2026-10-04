@@ -29,7 +29,12 @@ was made, so the rules matter as much as the essay.
 
 - `essay.md` is the single source of truth for the essay text.
 - Never edit anything in `docs/` by hand. Regenerate it with `build.py`
-  (colored web page, printable page, APA PDF).
+  (colored web page, printable page, APA PDF, and the record pages below).
+- Besides the essay, `build.py` renders the record pages so the website is the
+  plain-language front door: `prompts.html` (from `PROMPTS.md`), `costs.html`
+  (`COSTS.md`), `wordcount.html` (`WORDCOUNT.md`), `sources.html` (`SOURCES.md`)
+  and `method.html` (this README). Blue passages in the essay link to the
+  matching `#prompt-N` anchor on `prompts.html`.
 - Cite sources as `[@key]` (parenthetical) or `@key` (narrative), with entries in
   `refs.bib`.
 - The APA PDF is produced with Tectonic (a LaTeX engine) using the `apa7` class,

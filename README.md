@@ -16,12 +16,29 @@ Three versions are produced automatically from the same master text:
 
 - **Colored web page:** open the published website,
   <https://johannesnorbertwolf.github.io/academic-skills-essay-a/> (or `docs/index.html`).
-  Hover over any colored passage to see which prompt produced it.
+  Hover over any blue passage to preview the prompt that produced it; click it to
+  jump to the full exchange in the prompt log.
 - **Printable version:** open `docs/print.html` and print it (enable
   "background graphics" so the colors show). It works on paper too.
 - **The submission file:** `docs/essay.pdf` is the clean, APA 7 formatted essay
   that is handed in. It carries no coloring — the transparency lives in this
   repository, and the PDF points readers to it.
+
+## Explore the record on the website
+
+The published website is the friendly front door to everything. Besides the
+color-coded essay, it has a page for each part of the record:
+
+- **Prompt log** — every prompt sent to the AI and every reply it gave, plus the
+  planning questions and Johannes's answers. Clicking any blue passage in the
+  essay jumps straight to the prompt that produced it.
+- **Costs** — the token usage and API spend, read from the tool's own records.
+- **Word count** — the running essay-body count and the human/AI split.
+- **Sources** — what was used and how to cite it.
+- **How it was made** — this document.
+
+The repository stays the technical source of truth; the website is generated
+from it, so the two cannot disagree.
 
 ## The legend
 

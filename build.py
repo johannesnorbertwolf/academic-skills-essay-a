@@ -47,12 +47,11 @@ def parse_prompts(text):
     parts = re.split(r"^##\s*Prompt\s+(\d+)\s*$", text, flags=re.M)
     for i in range(1, len(parts) - 1, 2):
         num = int(parts[i])
+        block = re.search(r"\*\*Prompt sent:\*\*\s*\n((?:>.*(?:\n|$))+)", parts[i + 1])
         snippet = ""
-        for line in parts[i + 1].splitlines():
-            line = line.strip()
-            if line.startswith(">"):
-                snippet = line.lstrip(">").strip()
-                break
+        if block:
+            lines = [ln[1:].strip() for ln in block.group(1).splitlines()]
+            snippet = "\n".join(lines).strip()
         prompts[num] = snippet
     return prompts
 
@@ -132,13 +131,15 @@ def plain(text):
 
 
 def ai_span(text, num, prompts):
-    tip = "Written by the AI \u2014 prompt %d" % num
-    snippet = prompts.get(num, "")
-    if snippet:
-        tip += ': "%s"' % (snippet[:120] + ("\u2026" if len(snippet) > 120 else ""))
+    prompt = prompts.get(num, "").strip()
+    tip_body = html.escape(prompt).replace("\n", "<br>") if prompt else "(prompt text not available)"
+    tip = (
+        '<span class="tip"><span class="tip-h">Prompt %d &mdash; click to read the full exchange'
+        "</span>%s</span>" % (num, tip_body)
+    )
     return (
-        '<span class="ai" data-prompt="%d" title="%s">%s</span>'
-        % (num, html.escape(tip, quote=True), inline_text(text))
+        '<a class="ai" href="prompts.html#prompt-%d" data-prompt="%d">%s%s</a>'
+        % (num, num, inline_text(text), tip)
     )
 
 
@@ -242,6 +243,107 @@ def render_html(md, prompts):
         ai_words += a
         parts.append("<p>%s</p>" % inner)
     return "\n".join(parts), human_words, ai_words
+
+
+def slugify(text):
+    text = html.unescape(re.sub(r"<[^>]+>", "", text)).lower()
+    text = re.sub(r"[^\w\s-]", "", text)
+    return re.sub(r"[\s_]+", "-", text).strip("-")
+
+
+def md_inline(text):
+    text = html.escape(text)
+    text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
+    text = re.sub(r"\[([^\]]+)\]\((https?://[^\s)]+)\)", r'<a href="\2">\1</a>', text)
+    text = re.sub(r"&lt;(https?://[^\s&]+)&gt;", r'<a href="\1">\1</a>', text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"<em>\1</em>", text)
+    return text
+
+
+def render_markdown(md):
+    """Render the plain Markdown of the record files to HTML for the site."""
+    lines = md.split("\n")
+    out = []
+    i, n = 0, len(lines)
+    while i < n:
+        s = lines[i].strip()
+        if s == "":
+            i += 1
+            continue
+        if re.match(r"^(?:-{3,}|\*{3,}|_{3,})$", s):
+            out.append("<hr>")
+            i += 1
+            continue
+        m = re.match(r"^(#{1,6})\s+(.*)$", s)
+        if m:
+            lvl = len(m.group(1))
+            out.append(
+                '<h%d id="%s">%s</h%d>' % (lvl, slugify(m.group(2)), md_inline(m.group(2)), lvl)
+            )
+            i += 1
+            continue
+        if s.startswith("|") and i + 1 < n and re.match(r"^\s*\|?\s*:?-{2,}", lines[i + 1]):
+            header = [c.strip() for c in s.strip("|").split("|")]
+            i += 2
+            rows = []
+            while i < n and lines[i].strip().startswith("|"):
+                rows.append([c.strip() for c in lines[i].strip().strip("|").split("|")])
+                i += 1
+            thead = "".join("<th>%s</th>" % md_inline(c) for c in header)
+            body = "".join(
+                "<tr>%s</tr>" % "".join("<td>%s</td>" % md_inline(c) for c in r) for r in rows
+            )
+            out.append("<table><thead><tr>%s</tr></thead><tbody>%s</tbody></table>" % (thead, body))
+            continue
+        if s.startswith(">"):
+            paras, cur = [], []
+            while i < n and lines[i].strip().startswith(">"):
+                content = lines[i].strip()[1:].strip()
+                if content == "":
+                    if cur:
+                        paras.append(" ".join(cur))
+                        cur = []
+                else:
+                    cur.append(content)
+                i += 1
+            if cur:
+                paras.append(" ".join(cur))
+            out.append(
+                "<blockquote>%s</blockquote>" % "".join("<p>%s</p>" % md_inline(p) for p in paras)
+            )
+            continue
+        if re.match(r"^[-*]\s+", s):
+            items = []
+            while i < n and re.match(r"^[-*]\s+", lines[i].strip()):
+                items.append(md_inline(re.sub(r"^[-*]\s+", "", lines[i].strip())))
+                i += 1
+            out.append("<ul>%s</ul>" % "".join("<li>%s</li>" % it for it in items))
+            continue
+        if re.match(r"^\d+\.\s+", s):
+            items = []
+            while i < n and re.match(r"^\d+\.\s+", lines[i].strip()):
+                items.append(md_inline(re.sub(r"^\d+\.\s+", "", lines[i].strip())))
+                i += 1
+            out.append("<ol>%s</ol>" % "".join("<li>%s</li>" % it for it in items))
+            continue
+        para = []
+        while i < n:
+            t = lines[i].strip()
+            if (
+                t == ""
+                or t.startswith("#")
+                or t.startswith(">")
+                or t.startswith("|")
+                or re.match(r"^[-*]\s+", t)
+                or re.match(r"^\d+\.\s+", t)
+                or re.match(r"^(?:-{3,}|\*{3,}|_{3,})$", t)
+            ):
+                break
+            para.append(t)
+            i += 1
+        out.append("<p>%s</p>" % md_inline(" ".join(para)))
+    return "\n".join(out)
 
 
 def strip_ai_tags(text):
@@ -424,9 +526,14 @@ def word_state(count, lo, hi):
 
 STYLE = """
 :root{--human-bg:#e6f6e6;--human-bg-hover:#d3efd3;--ai-bg:#e3f0ff;--ai-bg-hover:#cfe4ff;
---ai-line:#2f6fd0;--ink:#1a1a1a;}
+--ai-line:#2f6fd0;--ink:#1a1a1a;--link:#2f6fd0;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:Georgia,'Times New Roman',serif;color:var(--ink);line-height:1.6;background:#fafafa;}
+nav.top{background:#fff;border-bottom:1px solid #ddd;padding:.5rem 1.5rem;font-family:system-ui,sans-serif;font-size:.85rem;}
+nav.top ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;}
+nav.top a{color:var(--link);text-decoration:none;}
+nav.top a:hover{text-decoration:underline;}
+nav.top a[aria-current=page]{color:#111;font-weight:600;}
 header{background:#fff;border-bottom:1px solid #ddd;padding:1.5rem 1.5rem 1rem;}
 header h1{font-size:1.3rem;margin:0 0 .3rem;font-family:system-ui,sans-serif;}
 .lede{margin:0 0 .8rem;color:#444;max-width:60rem;font-family:system-ui,sans-serif;font-size:.92rem;}
@@ -443,24 +550,99 @@ main h1{font-size:1.7rem;margin-top:0;}
 main h2{font-size:1.25rem;margin-top:2rem;border-bottom:1px solid #eee;padding-bottom:.2rem;}
 main p{margin:0 0 1rem;}
 .human{background:var(--human-bg);border-radius:2px;}
-.ai{background:var(--ai-bg);border-radius:2px;border-bottom:2px dashed var(--ai-line);cursor:help;}
-.ai:hover{background:var(--ai-bg-hover);}
+.ai{background:var(--ai-bg);border-radius:2px;border-bottom:2px dashed var(--ai-line);cursor:pointer;
+color:inherit;text-decoration:none;position:relative;}
+.ai:hover,.ai:focus{background:var(--ai-bg-hover);}
+.ai .tip{display:none;position:absolute;left:0;top:1.7em;z-index:60;width:min(32rem,86vw);
+background:#141821;color:#f5f5f5;padding:.7rem .85rem;border-radius:8px;font-family:system-ui,sans-serif;
+font-size:.82rem;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.3);white-space:normal;text-align:left;}
+.ai .tip .tip-h{display:block;font-weight:600;color:#9dc2f0;margin-bottom:.35rem;}
+.ai:hover .tip,.ai:focus .tip{display:block;}
+.record blockquote{border-left:3px solid #cdd7e5;background:#f7f9fc;margin:.6rem 0;
+padding:.5rem .9rem;border-radius:0 6px 6px 0;font-size:.95rem;}
+.record blockquote p{margin:.35rem 0;}
+.record table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.85rem;margin:1rem 0;}
+.record th,.record td{border:1px solid #dde3ec;padding:.4rem .6rem;text-align:left;vertical-align:top;}
+.record th{background:#f2f4f7;}
+.record code,code{background:#eef1f6;padding:.05rem .3rem;border-radius:3px;font-size:.9em;}
+.record hr{border:none;border-top:1px solid #e0e4ea;margin:2rem 0;}
+.record ul,.record ol{margin:0 0 1rem;padding-left:1.4rem;}
+.record li{margin:.2rem 0;}
 footer{max-width:46rem;margin:0 auto 3rem;padding:0 2.2rem;font-family:system-ui,sans-serif;
 font-size:.8rem;color:#666;}
-footer a{color:#2f6fd0;}
+footer a{color:var(--link);}
 @media print{
  body{background:#fff;}
+ nav.top{display:none;}
  header{border-bottom:1px solid #000;}
  main{border:none;margin:0;padding:0;max-width:none;}
  footer{max-width:none;padding:0;}
  .human,.ai{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+ .ai .tip{display:none !important;}
 }
 """
 
 
-def html_page(meta, mode, body, human_words, ai_words, essay_words):
-    title = meta.get("title", "Essay")
+NAV = [
+    ("index", "The essay", "index.html"),
+    ("prompts", "Prompt log", "prompts.html"),
+    ("costs", "Costs", "costs.html"),
+    ("wordcount", "Word count", "wordcount.html"),
+    ("sources", "Sources", "sources.html"),
+    ("method", "How it was made", "method.html"),
+    ("pdf", "The PDF", "essay.pdf"),
+]
+
+
+def nav_html(active, repo):
+    items = []
+    for key, label, href in NAV:
+        cur = ' aria-current="page"' if key == active else ""
+        items.append(
+            '<li><a href="%s"%s>%s</a></li>'
+            % (html.escape(href, quote=True), cur, html.escape(label))
+        )
+    items.append('<li><a href="%s">Source code (GitHub)</a></li>' % html.escape(repo, quote=True))
+    return '<nav class="top"><ul>%s</ul></nav>' % "".join(items)
+
+
+def page_shell(meta, active, title, header_html, main_html):
     repo = meta.get("repo", DEFAULT_REPO)
+    header_block = "<header>%s</header>" % header_html if header_html else ""
+    return """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%s</title>
+<style>%s</style>
+</head>
+<body>
+%s
+%s
+<main>
+%s
+</main>
+<footer>
+<p>This page is generated from the master text on %s. Source code, the full history
+and every raw file: <a href="%s">%s</a></p>
+</footer>
+</body>
+</html>
+""" % (
+        html.escape(title),
+        STYLE,
+        nav_html(active, repo),
+        header_block,
+        main_html,
+        date.today().isoformat(),
+        html.escape(repo, quote=True),
+        html.escape(repo),
+    )
+
+
+def essay_page(meta, mode, body, human_words, ai_words, essay_words):
+    title = meta.get("title", "Essay")
     total = human_words + ai_words
     if total:
         hp = round(100 * human_words / total)
@@ -479,57 +661,88 @@ def html_page(meta, mode, body, human_words, ai_words, essay_words):
         "&middot; target %d, required %d&ndash;%d &middot; <strong>%s</strong>"
         % (essay_words, target, lo, hi, state)
     )
-    note = (
-        '<p class="lede"><strong>Printable version.</strong> Print this page and enable '
-        "&ldquo;background graphics&rdquo; so the colors are kept. Light green is the human "
-        "author; light blue with a dashed underline is the AI.</p>"
-        if mode == "print"
-        else ""
+    if mode == "print":
+        lede = (
+            "<strong>Printable version.</strong> Print this page and enable "
+            "&ldquo;background graphics&rdquo; so the colors are kept. Light green is the "
+            "human author; light blue with a dashed underline is the AI."
+        )
+    else:
+        lede = (
+            "Every word is labeled. Light green is written by Johannes Wolf; light blue with a "
+            "dashed underline is written by the AI. This page is generated from the master text "
+            "(<code>essay.md</code>) and cannot disagree with it. <strong>Hover</strong> a blue "
+            "passage to preview the prompt that produced it, and <strong>click</strong> it to "
+            "read the full exchange in the prompt log."
+        )
+    header = (
+        "<h1>%s &mdash; who wrote what</h1>"
+        '<p class="lede">%s</p>'
+        '<div class="legend">'
+        '<span class="item"><span class="swatch human"></span> Written by Johannes Wolf</span>'
+        '<span class="item"><span class="swatch ai"></span> Written by the AI</span>'
+        "</div>"
+        '<p class="summary">%s</p>'
+        '<p class="summary">%s</p>'
+        % (html.escape(title), lede, summary, essay_line)
     )
-    hover = "" if mode == "print" else " Hover any blue passage to see which prompt produced it."
-    return """<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>%s</title>
-<style>%s</style>
-</head>
-<body>
-<header>
-<h1>%s &mdash; who wrote what</h1>
-<p class="lede">Every word is labeled. This page is generated from the master text
-(<code>essay.md</code>) and cannot disagree with it.%s</p>
-%s
-<div class="legend">
-<span class="item"><span class="swatch human"></span> Written by Johannes Wolf</span>
-<span class="item"><span class="swatch ai"></span> Written by the AI</span>
-</div>
-<p class="summary">%s</p>
-<p class="summary">%s</p>
-</header>
-<main>
-%s
-</main>
-<footer>
-<p>Generated from the master text on %s. Source, full prompt log and history:
-<a href="%s">%s</a></p>
-</footer>
-</body>
-</html>
-""" % (
-        html.escape(title),
-        STYLE,
-        html.escape(title),
-        hover,
-        note,
-        summary,
-        essay_line,
-        body,
-        date.today().isoformat(),
-        html.escape(repo, quote=True),
-        html.escape(repo),
-    )
+    return page_shell(meta, "index", title, header, body)
+
+
+def content_page(meta, active, lede, md_text):
+    first = md_text.strip().split("\n", 1)
+    head = re.match(r"^#\s+(.*)$", first[0].strip())
+    title = re.sub(r"\*\*|\*", "", head.group(1)).strip() if head else active.title()
+    if head and len(first) > 1:
+        md_text = first[1]
+    header = "<h1>%s</h1><p class=\"lede\">%s</p>" % (html.escape(title), lede)
+    main = '<div class="record">\n%s\n</div>' % render_markdown(md_text)
+    return page_shell(meta, active, title, header, main)
+
+
+def write_record_pages(meta):
+    pages = [
+        (
+            "prompts",
+            "Every prompt sent to the AI and every reply it gave, in order, plus the planning "
+            "questions and Johannes\u2019s answers. The numbers match the blue passages in the "
+            "essay.",
+            PROMPTS,
+        ),
+        (
+            "costs",
+            "What the AI assistance actually cost, in tokens and in dollars, read from the "
+            "tool\u2019s own records rather than estimated.",
+            ROOT / "COSTS.md",
+        ),
+        (
+            "wordcount",
+            "The running word count of the essay body, and how the words split between Johannes "
+            "and the AI.",
+            ROOT / "WORDCOUNT.md",
+        ),
+        (
+            "sources",
+            "The course syllabus and the two papers the essay draws on. The files themselves are "
+            "not published, for copyright reasons; this is the public record of what they are.",
+            ROOT / "SOURCES.md",
+        ),
+        (
+            "method",
+            "The full explanation of how this was made: what the record contains and how anyone "
+            "can verify it.",
+            ROOT / "README.md",
+        ),
+    ]
+    written = []
+    for key, lede, path in pages:
+        if not path.exists():
+            continue
+        (DOCS / ("%s.html" % key)).write_text(
+            content_page(meta, key, lede, path.read_text(encoding="utf-8")), encoding="utf-8"
+        )
+        written.append(key)
+    print("Built %s." % ", ".join("docs/%s.html" % k for k in written))
 
 
 # -------------------------------------------------------------- PDF (LaTeX)
@@ -856,12 +1069,13 @@ def main():
     lo, hi, target = word_limits(meta)
     DOCS.mkdir(exist_ok=True)
     (DOCS / "index.html").write_text(
-        html_page(meta, "screen", body, human_words, ai_words, essay_words), encoding="utf-8"
+        essay_page(meta, "screen", body, human_words, ai_words, essay_words), encoding="utf-8"
     )
     (DOCS / "print.html").write_text(
-        html_page(meta, "print", body, human_words, ai_words, essay_words), encoding="utf-8"
+        essay_page(meta, "print", body, human_words, ai_words, essay_words), encoding="utf-8"
     )
     write_wordcount(meta, essay_words, human_words, ai_words)
+    write_record_pages(meta)
     print("Built docs/index.html and docs/print.html.")
     total = human_words + ai_words
     if total:
