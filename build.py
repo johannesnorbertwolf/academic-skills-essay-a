@@ -728,7 +728,6 @@ LATEX_TEMPLATE = r'''\documentclass[stu,12pt,@@PAPERSIZE@@]{apa7}
 \course{@@COURSE@@}
 \professor{@@INSTRUCTOR@@}
 \duedate{@@DATE@@}
-\note{@@NOTE@@}
 \begin{document}
 \maketitle
 
@@ -758,8 +757,6 @@ def latex_document(meta, body, references, appendix):
         "@@COURSE@@": lesc(meta.get("course", "")),
         "@@INSTRUCTOR@@": lesc(meta.get("instructor", "")),
         "@@DATE@@": lesc(meta.get("date", "")),
-        "@@NOTE@@": "Transparency record: every word is attributed and every prompt is logged at \\url{%s}"
-        % meta.get("repo", DEFAULT_REPO),
         "@@BODY@@": body,
         "@@REFERENCES@@": references,
         "@@APPENDIX@@": appendix,
