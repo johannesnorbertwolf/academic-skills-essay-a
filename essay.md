@@ -43,13 +43,13 @@ is left out of the count. `build.py` writes the running total to WORDCOUNT.md.
 
 A university student spends many hours studying. Yet, many students are surprised and disappointed by their results. [[AI:20]]A common reason is that they rely on strategies that feel effective but are not: rereading a textbook chapter, for example, creates a sense of familiarity that is easily mistaken for real knowledge. Cognitive research has identified study techniques that produce more durable learning, yet students tend to underuse them. Self-report studies show that students favor rereading and highlighting over the methods that research supports [@miyatsu2018].[[/AI]] [[AI:53]]The most popular study techniques are therefore not the most effective ones.[[/AI]] [[AI:20]]Some reviews have responded by suggesting how students might improve the strategies they already prefer [@miyatsu2018]. A more [[/AI]]direct route, [[AI:20]]however, is to adopt the strategies with the strongest evidence. This essay therefore asks how university students can optimize their learning, and answers by discussing three evidence-based strategies: pretesting, retrieval practice, and spaced practice. Effective studying is not simply a matter of effort, but [[/AI]]of method.
 
-## [[AI:22]]Pretesting[[/AI]]
+# [[AI:22]]Pretesting[[/AI]]
 
 [[AI:20]]The first strategy is [[/AI]]pretesting: answering questions about the study material before any studying happens, even if the answers to the questions must [[AI:20]]be [[/AI]]guessed. This might seem counterintuitive, but research indicates that this strategy improves later recall [@putnam2016]. This activates any prior knowledge about the topic and prepares the student to [[AI:20]]connect new information with what is already known. Even incorrect guesses [[/AI]]are useful as they make the student notice [[AI:20]]and remember the correct [[/AI]]information once it appears. 
 
 Prequizzing is becoming easier to put into practice. Before a study session, such as a reading session or a lecture, a student can write down questions about the topic and attempt to answer them and return to them afterwards to check and correct the answers [@putnam2016]. Many textbooks also contain post-reading quizzes that can be easily repurposed for pretesting. The emergence of AI-chatbots gives us another option: create a quiz from lecture slides or textbook chapter and it can even be prompted to meet precisely specified requirements such as difficulty level or quiz size. The main obstacle to this strategy is psychological rather than practical: it feels wrong to guess at material without any prior studying. Intuitively, students prefer to read first. Recognizing that pretesting takes little time and prepares the memory helps to overcome this hesitation.
 
-## [[AI:22]]Retrieval Practice[[/AI]]
+# [[AI:22]]Retrieval Practice[[/AI]]
 
 The second strategy is retrieval practice: the reproduction or summarization of the study material after consuming it without looking at it. One implementation is the RRR method, Read, Recite, Review, described by @putnam2016: the student visits the lecture or reads the material, writes a summary from memory, and lastly reviews it against the study material. The second step is the retrieval itself, and the important part is that the student reproduces the material from memory rather than copying it. This both reactivates what was learned and reveals what was missed.
 
@@ -58,7 +58,7 @@ The student will not use the material for summarization but merely write down wh
 As discussed by @miyatsu2018, at least summarization and outlining can be altered in a way that makes use of retrieval by practicing these after studying the material from memory.
 
 
-## [[AI:22]]Spaced Practice[[/AI]]
+# [[AI:22]]Spaced Practice[[/AI]]
 
 The third strategy is spaced practice: this is not about how to study but when. If a student uses spaced practice, they study for short periods of time, mix studying of different subjects and take considerable breaks between study sessions. [[AI:33]]In practice, this means studying each subject a little on most days and revisiting earlier topics in later sessions.[[/AI]] The opposite of spaced practice is massed, crammed studying. According to @putnam2016, for the same time spent studying, spaced practice gives much better results.
 
